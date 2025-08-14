@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@invertase/react-native-apple-authentication": "^2.4.1",
+    "@react-native-google-signin/google-signin": "^15.0.0"
+  }
+}
