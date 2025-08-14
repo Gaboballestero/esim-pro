@@ -9,18 +9,11 @@ gunicorn>=21.2.0
 psycopg2-binary>=2.9.7
 dj-database-url>=2.1.0
 
-# CORS and Security
+# CORS
 django-cors-headers>=4.3.1
-whitenoise>=6.6.0
-
-# Configuration
-python-decouple>=3.8
 
 # JWT Authentication
 djangorestframework-simplejwt>=5.3.0
-
-# API and Filtering
-django-filter>=23.3
 
 # HTTP Requests
 requests>=2.31.0

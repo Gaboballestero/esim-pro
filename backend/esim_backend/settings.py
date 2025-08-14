@@ -141,17 +141,15 @@ TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) - DESACTIVADO para Railway
 STATIC_URL = '/static/'
-# Use absolute path for Railway deployment
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = None
 
-# Solo crear STATICFILES_DIRS si el directorio existe
-static_dir = BASE_DIR / 'static'
-if static_dir.exists():
-    STATICFILES_DIRS = [static_dir]
-else:
-    STATICFILES_DIRS = []
+# NO usar STATICFILES_DIRS para evitar errores
+STATICFILES_DIRS = []
+
+# Desactivar collectstatic
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -200,10 +198,10 @@ if cors_origins_env:
     additional_origins = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
     CORS_ALLOWED_ORIGINS.extend(additional_origins)
 
-# Add whitenoise for static files in production
-if not DEBUG:
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# NO usar whitenoise para simplificar deployment
+# if not DEBUG:
+#     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+#     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Comentamos el modelo custom user por ahora - usar el default de Django
 # AUTH_USER_MODEL = 'users.User'
