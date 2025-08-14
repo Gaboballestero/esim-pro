@@ -142,14 +142,16 @@ TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) - DESACTIVADO para Railway
+# Static files (CSS, JavaScript, Images) - Configurado para Railway
 STATIC_URL = '/static/'
-STATIC_ROOT = None
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# NO usar STATICFILES_DIRS para evitar errores
-STATICFILES_DIRS = []
+# Directorios de archivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-# Desactivar collectstatic
+# Storage para archivos estáticos
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 MEDIA_URL = '/media/'

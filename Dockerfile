@@ -24,11 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
-
 # Expose port
 EXPOSE $PORT
 
 # Run the application
-CMD python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 1
+CMD python manage.py migrate && python manage.py collectstatic --noinput && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 1
