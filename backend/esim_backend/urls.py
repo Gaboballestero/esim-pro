@@ -18,6 +18,7 @@ urlpatterns = [
     
     # API endpoints para tests de Twilio
     path('api/', api_views.api_root, name='api_root'),
+    path('api/ping/', views.health, name='api_ping'),  # Endpoint específico para Railway healthcheck
     path('api/test-credentials/', api_views.test_credentials, name='test_credentials'),
     path('api/esim/create/', api_views.create_esim, name='create_esim'),
     path('api/esim/usage/<str:sim_sid>/', api_views.check_usage, name='check_usage'),
