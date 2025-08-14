@@ -12,22 +12,8 @@ dj-database-url>=2.1.0
 # CORS
 django-cors-headers>=4.3.1
 
-# CORS
-django-cors-headers>=4.3.1
-
 # JWT Authentication
 djangorestframework-simplejwt>=5.3.0
 
 # HTTP Requests
 requests>=2.31.0
-
-# Development Tools
-black>=23.12.1
-flake8>=6.1.0
-
-# Testing
-pytest-django>=4.7.0
-factory-boy>=3.3.0
-
-# Production
-gunicorn>=21.2.0
