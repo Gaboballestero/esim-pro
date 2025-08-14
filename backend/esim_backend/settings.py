@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-1^daw$843ra3e_d@z7l$1a^iy6f59yjn_xe^48gsh9z^pxx5$0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
     'localhost', 
@@ -22,7 +22,10 @@ ALLOWED_HOSTS = [
     'hablaris.com',
     'www.hablaris.com',
     '*.hablaris.com',
-    '*.railway.app'
+    '*.railway.app',
+    'deayohmr.up.railway.app',
+    '*.up.railway.app',
+    '*'  # Permitir todos los hosts en producción temporalmente
 ]
 
 # Agregar dominios de Railway si existen
