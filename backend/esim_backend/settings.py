@@ -143,11 +143,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# Force staticfiles to be at /app/staticfiles/ in production
-STATIC_ROOT = '/app/staticfiles' if not DEBUG else BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# Use absolute path for Railway deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Solo crear STATICFILES_DIRS si el directorio existe
+static_dir = BASE_DIR / 'static'
+if static_dir.exists():
+    STATICFILES_DIRS = [static_dir]
+else:
+    STATICFILES_DIRS = []
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -201,8 +205,8 @@ if not DEBUG:
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Custom user model
-AUTH_USER_MODEL = 'users.User'
+# Comentamos el modelo custom user por ahora - usar el default de Django
+# AUTH_USER_MODEL = 'users.User'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

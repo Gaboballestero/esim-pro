@@ -1,1 +1,1 @@
-web: cd backend && mkdir -p /app/staticfiles && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+web: cd backend && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --max-requests 1000
