@@ -1,6 +1,0 @@
-# Railway Deployment Fix
-# This file forces Railway to redeploy with correct Procfile
-# Date: August 14, 2025
-# Fix: Use Django runserver instead of gunicorn
-
-RAILWAY_FORCE_REDEPLOY=true
