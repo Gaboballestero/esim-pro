@@ -1,1 +1,1 @@
-web: cd backend && python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT
+web: cd backend && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT
