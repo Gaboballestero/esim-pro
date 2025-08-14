@@ -185,13 +185,15 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.hablaris.com",
     "http://hablaris.com",
     "http://www.hablaris.com",
+    "https://web-production-c64b6.up.railway.app",
 ]
 
-# Add Railway URLs to CORS in production
-if 'RAILWAY_STATIC_URL' in os.environ:
-    CORS_ALLOWED_ORIGINS.append(os.environ['RAILWAY_STATIC_URL'])
-if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
-    CORS_ALLOWED_ORIGINS.append(f"https://{os.environ['RAILWAY_PUBLIC_DOMAIN']}")
+# Add custom CORS origins from environment variable
+cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
+if cors_origins_env:
+    # Split by comma and add each origin
+    additional_origins = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
+    CORS_ALLOWED_ORIGINS.extend(additional_origins)
 
 # Add whitenoise for static files in production
 if not DEBUG:
