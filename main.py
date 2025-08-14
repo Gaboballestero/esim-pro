@@ -7,18 +7,16 @@ Entry point for Railway deployment
 import os
 import sys
 import django
-from django.core.wsgi import get_wsgi_application
+from django.core.management import execute_from_command_line
 
 # Add backend to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+backend_path = os.path.join(os.path.dirname(__file__), 'backend')
+sys.path.insert(0, backend_path)
 
 # Set Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'esim_backend.settings')
 
-# Get WSGI application
-django.setup()
-application = get_wsgi_application()
-
 if __name__ == "__main__":
-    from django.core.management import execute_from_command_line
+    # Change to backend directory
+    os.chdir(backend_path)
     execute_from_command_line(sys.argv)
