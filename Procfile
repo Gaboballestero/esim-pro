@@ -1,1 +1,1 @@
-web: cd backend && python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+web: cd backend && python manage.py flush --noinput; python manage.py migrate; gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120

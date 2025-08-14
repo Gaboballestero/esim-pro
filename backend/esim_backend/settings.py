@@ -49,19 +49,17 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'corsheaders',
-    # 'django_filters',
-    # 'django_extensions',
 ]
 
 LOCAL_APPS = [
-    'users',  # Sistema de usuarios personalizado
-    'plans',  # Planes de datos
-    'esims',  # Gestión de eSIMs
-    'payments',  # Sistema de pagos
-    'support',  # Sistema de soporte
-    'rewards',  # Sistema de recompensas y referidos
-    'geolocation',  # Sistema de geolocalización inteligente
-    # 'flexible_plans',  # Planes flexibles y personalizados - opcional por ahora
+    # Apps locales desactivadas temporalmente para deployment inicial
+    # 'users',  # Sistema de usuarios personalizado
+    # 'plans',  # Planes de datos
+    # 'esims',  # Gestión de eSIMs
+    # 'payments',  # Sistema de pagos
+    # 'support',  # Sistema de soporte
+    # 'rewards',  # Sistema de recompensas y referidos
+    # 'geolocation',  # Sistema de geolocalización inteligente
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
