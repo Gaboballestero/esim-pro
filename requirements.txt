@@ -1,0 +1,4 @@
+# Este archivo redirige a los requirements del backend
+# Railway busca requirements.txt en la raíz del proyecto
+
+-r backend/requirements.txt

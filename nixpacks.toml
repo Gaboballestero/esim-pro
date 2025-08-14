@@ -2,9 +2,9 @@
 nixPkgs = ['python310', 'postgresql']
 
 [phases.install]
-cmds = ['pip install -r backend/requirements.txt']
+cmds = ['pip install -r requirements.txt']
 
-[phases.build]
+[phases.build] 
 cmds = ['cd backend && python manage.py collectstatic --noinput']
 
 [start]
