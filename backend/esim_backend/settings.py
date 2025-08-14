@@ -143,8 +143,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# In production, staticfiles should be at the root level
-STATIC_ROOT = BASE_DIR.parent / 'staticfiles' if not DEBUG else BASE_DIR / 'staticfiles'
+# Force staticfiles to be at /app/staticfiles/ in production
+STATIC_ROOT = '/app/staticfiles' if not DEBUG else BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
