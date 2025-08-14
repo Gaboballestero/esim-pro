@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hablaris eSIM Platform - Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hablaris-gradient {
+            background: linear-gradient(135deg, #4F9AFA 0%, #6C5CE7 100%);
+        }
+        .hablaris-glow {
+            box-shadow: 0 0 20px rgba(79, 154, 250, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
+        <div class="px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 hablaris-gradient rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-lg">H</span>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-white">Hablaris</h1>
+                        <p class="text-slate-400 text-xs">Conectividad sin fronteras</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-white">
+                    <span>✅ Servidor funcionando</span>
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="px-8 py-2 border-t border-slate-700/30">
+            <div class="flex space-x-6">
+                <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-button active">
+                    📊 Dashboard
+                </button>
+                <button onclick="showTab('esims')" id="tab-esims" class="tab-button">
+                    📱 Mis eSIMs
+                </button>
+                <button onclick="showTab('shop')" id="tab-shop" class="tab-button">
+                    🛒 Shop
+                </button>
+                <button onclick="showTab('profile')" id="tab-profile" class="tab-button">
+                    👤 Perfil
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-8">
+        <!-- Dashboard Tab -->
+        <div id="content-dashboard" class="tab-content">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">📊 Dashboard Principal</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 text-sm">eSIMs Activos</p>
+                            <p class="text-3xl font-bold text-slate-900">3</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                            <span class="text-2xl">📱</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 text-sm">Datos Usados</p>
+                            <p class="text-3xl font-bold text-slate-900">2.1GB</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                            <span class="text-2xl">📊</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 text-sm">Países</p>
+                            <p class="text-3xl font-bold text-slate-900">15</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                            <span class="text-2xl">🌍</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-green-50 rounded-lg p-4 mb-6">
+                <h3 class="font-semibold text-green-800 mb-2">✅ Estado del Sistema</h3>
+                <ul class="text-green-700 text-sm space-y-1">
+                    <li>✅ Frontend: Funcionando correctamente</li>
+                    <li>✅ API Routes: /api/esim/create, /api/esim/usage configuradas</li>
+                    <li>✅ Branding Hablaris: Integrado</li>
+                    <li>✅ Twilio Integration: Configurado en test mode</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- eSIMs Tab -->
+        <div id="content-esims" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">📱 Mis eSIMs</h2>
+            
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div class="bg-white rounded-xl border border-slate-200 p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-semibold text-slate-900">España 2GB</h3>
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">🟢 Activa</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">🇪🇸 España • 7 días</p>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Datos usados</span>
+                            <span>456MB / 2GB</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 22.8%"></div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showQR('ESP001')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700">
+                        📱 Ver código QR
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-xl border border-slate-200 p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-semibold text-slate-900">Francia 1GB</h3>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">🔵 Nueva</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">🇫🇷 Francia • 5 días</p>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Datos usados</span>
+                            <span>0MB / 1GB</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showQR('FRA001')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700">
+                        📱 Ver código QR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Tab -->
+        <div id="content-shop" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">🛒 Hablaris Shop</h2>
+            
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-2xl">🇪🇸</span>
+                            <div>
+                                <h3 class="font-bold text-slate-900">España Premium</h3>
+                                <p class="text-sm text-slate-600">Red 5G ultrarrápida</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-slate-50 rounded p-2 text-center">
+                                <p class="text-xs text-slate-500">Datos</p>
+                                <p class="font-bold">2GB</p>
+                            </div>
+                            <div class="bg-slate-50 rounded p-2 text-center">
+                                <p class="text-xs text-slate-500">Duración</p>
+                                <p class="font-bold">7 días</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-slate-900">$15.99</span>
+                            <span class="text-sm text-slate-500 line-through">$19.99</span>
+                        </div>
+                        
+                        <button onclick="buyPlan('ESP_2GB')" class="w-full hablaris-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Comprar ahora
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-2xl">🇫🇷</span>
+                            <div>
+                                <h3 class="font-bold text-slate-900">Francia Básico</h3>
+                                <p class="text-sm text-slate-600">Perfecto para turismo</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-slate-50 rounded p-2 text-center">
+                                <p class="text-xs text-slate-500">Datos</p>
+                                <p class="font-bold">1GB</p>
+                            </div>
+                            <div class="bg-slate-50 rounded p-2 text-center">
+                                <p class="text-xs text-slate-500">Duración</p>
+                                <p class="font-bold">5 días</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-slate-900">$12.99</span>
+                        </div>
+                        
+                        <button onclick="buyPlan('FRA_1GB')" class="w-full hablaris-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Comprar ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="content-profile" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">👤 Mi Perfil</h2>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 hablaris-gradient rounded-full flex items-center justify-center">
+                        <span class="text-white text-2xl font-bold">U</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Usuario Test</h3>
+                        <p class="text-slate-600">test@hablaris.com</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-slate-900 mb-3">Estadísticas</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Total eSIMs:</span>
+                                <span class="font-medium">3</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Países visitados:</span>
+                                <span class="font-medium">15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Datos totales:</span>
+                                <span class="font-medium">12.5 GB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-slate-900 mb-3">Configuración</h4>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+                                🔔 Notificaciones
+                            </button>
+                            <button class="w-full text-left p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+                                💳 Métodos de pago
+                            </button>
+                            <button class="w-full text-left p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+                                🌍 Idioma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- QR Modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">📱 Código QR</h3>
+                <button onclick="closeQR()" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+            </div>
+            
+            <div class="text-center">
+                <div class="bg-slate-100 p-4 rounded-lg mb-4">
+                    <div class="w-48 h-48 mx-auto bg-white rounded flex items-center justify-center">
+                        <span class="text-6xl">📱</span>
+                    </div>
+                </div>
+                
+                <h4 class="font-semibold mb-2" id="qr-title">España 2GB</h4>
+                <p class="text-sm text-slate-600 mb-4">Escanea con tu dispositivo</p>
+                
+                <div class="bg-slate-50 rounded-lg p-3 mb-4">
+                    <p class="text-xs text-slate-700">Código manual:</p>
+                    <p class="text-xs font-mono text-slate-600 break-all" id="qr-code">
+                        LPA:1$rsp-prod.hablaris.com$abc123def456
+                    </p>
+                </div>
+                
+                <button onclick="copyCode()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700">
+                    📋 Copiar código
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            
+            // Add active class to selected button
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+        
+        // QR Modal functionality
+        function showQR(simId) {
+            const titles = {
+                'ESP001': 'España 2GB',
+                'FRA001': 'Francia 1GB'
+            };
+            
+            const codes = {
+                'ESP001': 'LPA:1$rsp-prod.hablaris.com$esp001abc123',
+                'FRA001': 'LPA:1$rsp-prod.hablaris.com$fra001def456'
+            };
+            
+            document.getElementById('qr-title').textContent = titles[simId];
+            document.getElementById('qr-code').textContent = codes[simId];
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+        
+        function closeQR() {
+            document.getElementById('qr-modal').classList.add('hidden');
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('qr-code').textContent;
+            navigator.clipboard.writeText(code);
+            alert('✅ Código copiado al portapapeles');
+        }
+        
+        // Purchase functionality
+        function buyPlan(planId) {
+            alert('🛒 Simulando compra de ' + planId + '\n\n✅ En la versión completa:\n- Se abriría checkout modal\n- Se procesaría el pago\n- Se crearía eSIM automáticamente\n- Se redirigiría a "Mis eSIMs"');
+        }
+        
+        // Tab button styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .tab-button {
+                padding: 0.5rem 1rem;
+                color: #94a3b8;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                border-radius: 0.5rem;
+                transition: all 0.2s;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+            
+            .tab-button:hover {
+                color: white;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .tab-button.active {
+                color: #3b82f6;
+                background: rgba(59, 130, 246, 0.1);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hablaris - Test Twilio DIRECTO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 3rem; }
+        .logo {
+            width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 16px;
+            background: linear-gradient(135deg, #4F9AFA 0%, #6C5CE7 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: bold;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; color: #4F9AFA; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .test-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; padding: 2rem; backdrop-filter: blur(10px);
+        }
+        .test-card h3 { font-size: 1.3rem; margin-bottom: 1rem; color: #00D4AA; }
+        .btn {
+            width: 100%; padding: 1rem; border-radius: 10px; border: none;
+            font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+        .btn-primary { background: linear-gradient(135deg, #4F9AFA 0%, #6C5CE7 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); }
+        .result { background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 8px; margin-top: 1rem; 
+                 font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .status { padding: 0.5rem; margin: 0.5rem 0; border-radius: 5px; }
+        .success { background: rgba(0, 212, 170, 0.2); border: 1px solid #00D4AA; }
+        .error { background: rgba(255, 71, 87, 0.2); border: 1px solid #ff4757; }
+        input, select { width: 100%; padding: 0.75rem; margin: 0.5rem 0; border-radius: 8px; 
+                       border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); 
+                       color: white; font-size: 1rem; }
+        input::placeholder { color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🧪</div>
+            <h1>Test Twilio eSIM - DIRECTO</h1>
+            <p>Panel de pruebas directo sin dependencias</p>
+        </div>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🔐 Test de Credenciales</h3>
+                <button class="btn btn-primary" onclick="testCredentials()">Probar Credenciales Twilio</button>
+                <div id="cred-result"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>🌐 Test de Backend</h3>
+                <button class="btn btn-primary" onclick="testBackend()">Verificar Backend Django</button>
+                <div id="backend-result"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>📱 Crear eSIM</h3>
+                <select id="country">
+                    <option value="US">Estados Unidos</option>
+                    <option value="ES">España</option>
+                    <option value="MX">México</option>
+                </select>
+                <select id="plan">
+                    <option value="1GB">1GB - $10</option>
+                    <option value="3GB">3GB - $25</option>
+                    <option value="5GB">5GB - $40</option>
+                </select>
+                <input type="email" id="email" placeholder="test@hablaris.com" value="test@hablaris.com">
+                <button class="btn btn-success" onclick="createESIM()">Crear eSIM Real</button>
+                <div id="esim-result"></div>
+            </div>
+            
+            <div class="test-card">
+                <h3>📊 Consultar Uso</h3>
+                <input type="text" id="sim-sid" placeholder="SIM SID (DE...)">
+                <button class="btn btn-primary" onclick="checkUsage()">Consultar Uso</button>
+                <div id="usage-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            const statusClass = isSuccess ? 'success' : 'error';
+            const timestamp = new Date().toLocaleTimeString();
+            
+            element.innerHTML = `
+                <div class="status ${statusClass}">${isSuccess ? '✅' : '❌'} ${timestamp}</div>
+                <div class="result">${typeof content === 'object' ? JSON.stringify(content, null, 2) : content}</div>
+            `;
+        }
+        
+        async function testCredentials() {
+            showResult('cred-result', 'Probando credenciales...', true);
+            try {
+                const response = await fetch(`${API_BASE}/api/test-credentials/`);
+                const data = await response.json();
+                showResult('cred-result', data, response.ok);
+            } catch (error) {
+                showResult('cred-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testBackend() {
+            showResult('backend-result', 'Verificando backend...', true);
+            try {
+                const response = await fetch(`${API_BASE}/api/`);
+                const data = await response.json();
+                showResult('backend-result', data, response.ok);
+            } catch (error) {
+                showResult('backend-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        async function createESIM() {
+            const country = document.getElementById('country').value;
+            const plan = document.getElementById('plan').value;
+            const email = document.getElementById('email').value;
+            
+            showResult('esim-result', 'Creando eSIM...', true);
+            try {
+                const response = await fetch(`${API_BASE}/api/esim/create/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        country: country,
+                        data_plan: plan,
+                        customer_name: 'Test User',
+                        email: email
+                    })
+                });
+                const data = await response.json();
+                showResult('esim-result', data, response.ok);
+                
+                if (response.ok && data.sim_sid) {
+                    document.getElementById('sim-sid').value = data.sim_sid;
+                }
+            } catch (error) {
+                showResult('esim-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        async function checkUsage() {
+            const simSid = document.getElementById('sim-sid').value;
+            if (!simSid) {
+                showResult('usage-result', 'Por favor ingresa un SIM SID', false);
+                return;
+            }
+            
+            showResult('usage-result', 'Consultando uso...', true);
+            try {
+                const response = await fetch(`${API_BASE}/api/esim/usage/${simSid}/`);
+                const data = await response.json();
+                showResult('usage-result', data, response.ok);
+            } catch (error) {
+                showResult('usage-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // Test automático al cargar
+        window.addEventListener('load', () => {
+            console.log('🧪 Test Twilio Directo - Cargado');
+            console.log('🔗 Backend:', API_BASE);
+            
+            // Test automático de backend
+            setTimeout(testBackend, 1000);
+        });
+    </script>
+</body>
+</html>

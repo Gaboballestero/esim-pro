@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Hablaris",
+    "slug": "esim-pro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.esimpro.mobile"
+    },
+    "android": {
+      "package": "com.esimpro.mobile",
+      "permissions": [
+        "CAMERA",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "useNextNotificationsApi": true
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#FF6B35",
+      "sounds": ["./assets/notification-sound.wav"],
+      "androidMode": "default",
+      "androidCollapsedTitle": "Hablaris",
+      "iosDisplayInForeground": true
+    },
+    "web": {
+    },
+    "extra": {
+      "apiUrl": "http://localhost:8000/api"
+    }
+  }
+}

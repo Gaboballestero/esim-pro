@@ -1,0 +1,15 @@
+[build]
+  builder = "NIXPACKS"
+
+[deploy]
+  healthcheckPath = "/health/"
+  healthcheckTimeout = 300
+  restartPolicyType = "ON_FAILURE"
+
+[environments.production.variables]
+  DJANGO_SETTINGS_MODULE = "esim_backend.settings"
+  PYTHONPATH = "/app/backend"
+  
+[environments.production.deploy]
+  numReplicas = 1
+  sleepApplication = false

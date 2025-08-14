@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hablaris eSIM - Test 1oT Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        
+        .section:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .emoji {
+            font-size: 1.5em;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-success {
+            background: #28a745;
+        }
+        
+        .status-error {
+            background: #dc3545;
+        }
+        
+        .status-loading {
+            background: #ffc107;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .provider-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .test-mode-indicator {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Hablaris eSIM - Test 1oT</h1>
+        
+        <!-- Test de Credenciales 1oT -->
+        <div class="section">
+            <h2><span class="emoji">🔐</span> Test Credenciales 1oT <span class="provider-badge">1oT</span></h2>
+            <button onclick="testCredentials1oT()">Probar Conexión 1oT</button>
+            <div id="credentialsResult"></div>
+        </div>
+        
+        <!-- Crear eSIM con 1oT -->
+        <div class="section">
+            <h2><span class="emoji">📱</span> Crear eSIM 1oT <span class="provider-badge">1oT</span></h2>
+            <div class="form-group">
+                <label for="country1ot">País:</label>
+                <select id="country1ot">
+                    <option value="ES">España (ES)</option>
+                    <option value="FR">Francia (FR)</option>
+                    <option value="IT">Italia (IT)</option>
+                    <option value="DE">Alemania (DE)</option>
+                    <option value="US">Estados Unidos (US)</option>
+                    <option value="GB">Reino Unido (GB)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dataPlan1ot">Plan de Datos:</label>
+                <select id="dataPlan1ot">
+                    <option value="1GB">1GB</option>
+                    <option value="3GB">3GB</option>
+                    <option value="5GB">5GB</option>
+                    <option value="10GB">10GB</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email1ot">Email Cliente:</label>
+                <input type="email" id="email1ot" placeholder="cliente@ejemplo.com">
+            </div>
+            <div class="form-group">
+                <label for="customerName1ot">Nombre Cliente:</label>
+                <input type="text" id="customerName1ot" placeholder="Nombre del cliente">
+            </div>
+            <button onclick="createESim1oT()">Crear eSIM 1oT</button>
+            <div id="esimResult1ot"></div>
+        </div>
+        
+        <!-- Consultar Uso -->
+        <div class="section">
+            <h2><span class="emoji">📊</span> Consultar Uso eSIM <span class="provider-badge">1oT</span></h2>
+            <div class="form-group">
+                <label for="esimId1ot">ID de eSIM:</label>
+                <input type="text" id="esimId1ot" placeholder="ICCID o ID de la eSIM">
+            </div>
+            <button onclick="checkUsage1oT()">Consultar Uso</button>
+            <div id="usageResult1ot"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/1ot';
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                return {
+                    success: false,
+                    error: `Error de conexión: ${error.message}`
+                };
+            }
+        }
+        
+        function showResult(elementId, data, isLoading = false) {
+            const element = document.getElementById(elementId);
+            
+            if (isLoading) {
+                element.innerHTML = `
+                    <div class="result info">
+                        <span class="status-indicator status-loading"></span>
+                        Procesando solicitud... 🔄
+                    </div>
+                `;
+                return;
+            }
+            
+            const statusClass = data.success ? 'success' : 'error';
+            const statusIndicator = data.success ? 'status-success' : 'status-error';
+            const testModeIndicator = data.test_mode ? '<div class="test-mode-indicator">🧪 MODO TEST</div>' : '';
+            
+            element.innerHTML = `
+                <div class="result ${statusClass}">
+                    <span class="status-indicator ${statusIndicator}"></span>
+                    ${testModeIndicator}
+                    <strong>${data.success ? '✅ Éxito' : '❌ Error'}:</strong>
+                    ${JSON.stringify(data, null, 2)}
+                </div>
+            `;
+        }
+        
+        async function testCredentials1oT() {
+            showResult('credentialsResult', null, true);
+            const result = await makeRequest(`${API_BASE}/test-credentials/`);
+            showResult('credentialsResult', result);
+        }
+        
+        async function createESim1oT() {
+            const country = document.getElementById('country1ot').value;
+            const dataPlan = document.getElementById('dataPlan1ot').value;
+            const email = document.getElementById('email1ot').value;
+            const customerName = document.getElementById('customerName1ot').value;
+            
+            if (!email || !customerName) {
+                showResult('esimResult1ot', {
+                    success: false,
+                    error: 'Por favor completa email y nombre del cliente'
+                });
+                return;
+            }
+            
+            showResult('esimResult1ot', null, true);
+            
+            const result = await makeRequest(`${API_BASE}/esim/create/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    country,
+                    data_plan: dataPlan,
+                    email,
+                    customer_name: customerName
+                })
+            });
+            
+            showResult('esimResult1ot', result);
+            
+            // Si la creación fue exitosa, auto-llenar el campo de consulta de uso
+            if (result.success && result.esim_data && result.esim_data.iccid) {
+                document.getElementById('esimId1ot').value = result.esim_data.iccid;
+            }
+        }
+        
+        async function checkUsage1oT() {
+            const esimId = document.getElementById('esimId1ot').value;
+            
+            if (!esimId) {
+                showResult('usageResult1ot', {
+                    success: false,
+                    error: 'Por favor ingresa un ID de eSIM'
+                });
+                return;
+            }
+            
+            showResult('usageResult1ot', null, true);
+            const result = await makeRequest(`${API_BASE}/esim/usage/${esimId}/`);
+            showResult('usageResult1ot', result);
+        }
+        
+        // Auto-rellenar algunos campos para testing rápido
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email1ot').value = 'test@hablaris.com';
+            document.getElementById('customerName1ot').value = 'Test Customer 1oT';
+        });
+    </script>
+</body>
+</html>

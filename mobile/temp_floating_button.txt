@@ -1,0 +1,17 @@
+﻿        </ScrollView>
+
+        {/* Floating QR Scanner Button */}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate('QRScanner')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.floatingButtonGradient}
+          >
+            <Ionicons name="qr-code-outline" size={28} color={COLORS.white} />
+          </LinearGradient>
+        </TouchableOpacity>
+
+      </SafeAreaView>

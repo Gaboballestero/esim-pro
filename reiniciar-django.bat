@@ -1,0 +1,13 @@
+@echo off
+echo 🔄 Reiniciando Django para aplicar cambios...
+cd /d "C:\Users\nayel\Esim\backend"
+
+echo 📦 Activando entorno virtual...
+call .venv\Scripts\activate.bat
+
+echo 📚 Instalando Twilio...
+pip install twilio
+
+echo 🚀 Iniciando servidor Django...
+python manage.py runserver
+pause
