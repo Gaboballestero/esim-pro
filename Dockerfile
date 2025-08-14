@@ -24,6 +24,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
+# Copy and make entrypoint script executable
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
@@ -31,4 +35,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE $PORT
 
 # Run the application
-CMD ["sh", "-c", "python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 1"]
+ENTRYPOINT ["/entrypoint.sh"]
