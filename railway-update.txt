@@ -1,0 +1,7 @@
+# RAILWAY FORCE UPDATE
+# Service: esim pro
+# Domain: hablaris.com
+# Fix: Force Railway to use new Procfile configuration
+# Date: August 14, 2025 - 10:30 AM
+
+FORCE_UPDATE_TIMESTAMP=$(date)
