@@ -12,6 +12,9 @@ dj-database-url>=2.1.0
 # CORS
 django-cors-headers>=4.3.1
 
+# CORS
+django-cors-headers>=4.3.1
+
 # JWT Authentication
 djangorestframework-simplejwt>=5.3.0
 
