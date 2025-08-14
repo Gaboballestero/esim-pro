@@ -2,12 +2,15 @@
   builder = "NIXPACKS"
 
 [deploy]
+  startCommand = "cd backend && python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT"
   healthcheckPath = "/health/"
   healthcheckTimeout = 300
   restartPolicyType = "ON_FAILURE"
 
 [environments.production.variables]
   DJANGO_SETTINGS_MODULE = "esim_backend.settings"
+  DEBUG = "False"
+  PORT = "$PORT"
   PYTHONPATH = "/app/backend"
   
 [environments.production.deploy]

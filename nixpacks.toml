@@ -1,0 +1,13 @@
+[variables]
+    NIXPACKS_PYTHON_VERSION = "3.11"
+
+[phases.setup]
+    dependsOn = ["install"]
+    cmds = ["cd backend"]
+
+[phases.build]
+    dependsOn = ["setup"]
+    cmds = ["cd backend && python manage.py collectstatic --noinput || true"]
+
+[start]
+    cmd = "cd backend && python manage.py migrate && gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT"
