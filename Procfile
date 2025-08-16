@@ -1,1 +1,1 @@
-web: gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT --preload
+web: python railway_start.py
