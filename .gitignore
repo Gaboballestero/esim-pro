@@ -116,3 +116,7 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Railway files (avoid conflicts)
+railway.json
+railway.toml
