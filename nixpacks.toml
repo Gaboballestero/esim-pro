@@ -1,0 +1,11 @@
+[providers]
+python = "3.11"
+
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.11"
+
+[phases.build]
+dependsOn = ["install"]
+
+[phases.install]
+dependsOn = ["setup"]
