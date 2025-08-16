@@ -1,0 +1,19 @@
+{
+  "name": "eSIM Pro",
+  "description": "eSIM Management Platform",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": {
+      "description": "Django settings module",
+      "value": "esim_backend.settings"
+    },
+    "DEBUG": {
+      "description": "Debug mode",
+      "value": "True"
+    }
+  }
+}

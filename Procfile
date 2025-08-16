@@ -1,1 +1,2 @@
-web: python start_server.py
+web: gunicorn esim_backend.wsgi:application --bind 0.0.0.0:$PORT
+release: python manage.py migrate
