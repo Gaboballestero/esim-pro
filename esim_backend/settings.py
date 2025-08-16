@@ -24,6 +24,7 @@ ALLOWED_HOSTS = [
     '*.hablaris.com',
     '*.railway.app',
     'deayohmr.up.railway.app',
+    '0kie0w8b.up.railway.app',
     '*.up.railway.app',
     '*'  # Permitir todos los hosts en producción temporalmente
 ]
@@ -142,16 +143,14 @@ TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) - Configurado para Railway
+# Static files (CSS, JavaScript, Images) - DESACTIVADO para Railway
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = None
 
-# Directorios de archivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# NO usar STATICFILES_DIRS para evitar errores
+STATICFILES_DIRS = []
 
-# Storage para archivos estáticos
+# Desactivar collectstatic
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 MEDIA_URL = '/media/'
