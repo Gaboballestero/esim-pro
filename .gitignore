@@ -120,3 +120,4 @@ temp/
 # Railway files (avoid conflicts)
 railway.json
 railway.toml
+Dockerfile
