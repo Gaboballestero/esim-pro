@@ -1,24 +1,7 @@
 {
-  "name": "eSIM Pro",
-  "description": "eSIM Management Platform",
   "buildpacks": [
     {
       "url": "https://github.com/heroku/heroku-buildpack-python.git"
     }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": {
-      "description": "Django settings module",
-      "value": "esim_backend.settings"
-    },
-    "DEBUG": {
-      "description": "Debug mode",
-      "value": "True"
-    },
-    "PYTHONPATH": {
-      "description": "Python path",
-      "value": "."
-    }
-  },
-  "stack": "heroku-22"
+  ]
 }
