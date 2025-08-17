@@ -204,13 +204,87 @@ def store_auth(request):
             request.session['dev_user'] = username
             return redirect('/store/')
         else:
-            # Error con mensaje más claro
-            return render(request, 'store_auth.html', {
-                'error': 'Credenciales incorrectas. Usuario: hablaris_dev'
-            })
+            # Error con mensaje más claro - usar template si existe, sino HTML inline
+            error_msg = 'Credenciales incorrectas. Usuario: hablaris_dev'
+            try:
+                return render(request, 'store_auth.html', {'error': error_msg})
+            except:
+                # Fallback HTML inline si los templates fallan
+                return HttpResponse(f'''
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Error - Hablaris Store</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                </head>
+                <body class="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-gray-900 flex items-center justify-center">
+                    <div class="bg-black/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-red-500/30 max-w-md w-full mx-4">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">❌</div>
+                            <h1 class="text-2xl font-bold text-white mb-4">Error de Acceso</h1>
+                            <div class="bg-red-900/40 border border-red-500 rounded-lg p-4 mb-6">
+                                <div class="text-red-300">{error_msg}</div>
+                            </div>
+                            <a href="/store/auth/" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 inline-block">
+                                🔄 Intentar de Nuevo
+                            </a>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                ''')
     
-    # Template con CSRF token
-    return render(request, 'store_auth.html')
+    # Template principal o fallback
+    try:
+        return render(request, 'store_auth.html')
+    except:
+        # HTML inline como fallback
+        return HttpResponse('''
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Acceso Restringido - Hablaris Store</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+            <div class="bg-black/20 backdrop-blur-2xl p-8 rounded-2xl shadow-2xl border border-white/20 max-w-md w-full mx-4">
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-4">🔐</div>
+                    <h1 class="text-2xl font-bold text-white mb-2">Acceso de Desarrollo</h1>
+                    <p class="text-gray-300 mb-4">Tienda en desarrollo - Solo personal autorizado</p>
+                    
+                    <div class="bg-blue-900/30 rounded-lg p-4 text-left text-sm">
+                        <div class="text-blue-200 font-bold mb-2">🔑 Credenciales:</div>
+                        <div class="text-green-300">Usuario: <strong>hablaris_dev</strong></div>
+                        <div class="text-green-300">Contraseña: <strong>Store2025!</strong></div>
+                    </div>
+                </div>
+                
+                <form method="post" class="space-y-4">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="''' + request.META.get('CSRF_COOKIE', 'dummy') + '''">
+                    <div>
+                        <input type="text" name="username" placeholder="Usuario" value="hablaris_dev" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400" required>
+                    </div>
+                    <div>
+                        <input type="password" name="password" placeholder="Contraseña" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400" required>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all">
+                        🚀 Acceder a la Tienda Beta
+                    </button>
+                </form>
+                
+                <div class="text-center mt-6">
+                    <div class="text-yellow-300 text-sm mb-2">⚠️ Después del login → /store/</div>
+                    <a href="/" class="text-blue-400 hover:text-blue-300 text-sm">← Volver al inicio</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        ''')
 
 def store(request):
     """Tienda eSIM funcional con filtros avanzados inspirada en Holafly/Nomad pero mejorada"""
