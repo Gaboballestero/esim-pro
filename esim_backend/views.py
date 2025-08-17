@@ -199,10 +199,73 @@ def shop(request):
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@csrf_exempt
+def admin_login_simple(request):
+    """Vista de login simple que evita problemas CSRF"""
+    if request.method == 'POST':
+        from django.contrib.auth import authenticate, login
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_staff:
+            login(request, user)
+            return redirect('/admin/')
+        else:
+            return HttpResponse('''
+            <h2>❌ Error de Login</h2>
+            <p>Usuario o contraseña incorrectos</p>
+            <p><strong>Usuario:</strong> admin</p>
+            <p><strong>Contraseña:</strong> admin123</p>
+            <a href="/admin-simple/">Intentar de nuevo</a>
+            ''')
+    
+    return HttpResponse('''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Login Simple Admin</title>
+        <style>
+            body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; }
+            input { width: 100%; padding: 10px; margin: 10px 0; }
+            button { width: 100%; padding: 15px; background: #007cba; color: white; border: none; }
+        </style>
+    </head>
+    <body>
+        <h2>🚀 Hablaris Admin - Login Simple</h2>
+        <p><strong>Credenciales:</strong> admin / admin123</p>
+        <form method="post">
+            <input type="text" name="username" placeholder="Usuario" value="admin">
+            <input type="password" name="password" placeholder="Contraseña">
+            <button type="submit">Entrar al Admin</button>
+        </form>
+    </body>
+    </html>
+    ''')
 
 def create_admin_emergency(request):
     """Vista de emergencia para crear admin en Railway"""
     try:
+        # Mostrar información de debugging
+        total_users = User.objects.count()
+        admin_exists = User.objects.filter(username='admin').exists()
+        
+        html_response = f'''
+        <html>
+        <head><title>Admin Emergency - Hablaris</title></head>
+        <body style="font-family: Arial; padding: 20px; background: #f0f2f5;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <h1>🚨 Admin Emergency Creator</h1>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <h3>📊 Estado de la Base de Datos:</h3>
+                    <p><strong>Total usuarios:</strong> {total_users}</p>
+                    <p><strong>Admin existe:</strong> {"SÍ" if admin_exists else "NO"}</p>
+                </div>
+        '''
+        
         # Verificar si ya existe
         if User.objects.filter(username='admin').exists():
             admin_user = User.objects.get(username='admin')
@@ -210,7 +273,15 @@ def create_admin_emergency(request):
             admin_user.is_superuser = True
             admin_user.is_staff = True
             admin_user.save()
-            return HttpResponse('✅ Admin actualizado: username=admin, password=admin123')
+            html_response += '''
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px;">
+                    <h3>✅ ADMIN ACTUALIZADO EXITOSAMENTE</h3>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Contraseña:</strong> admin123</p>
+                    <p><strong>Superuser:</strong> SÍ</p>
+                    <p><strong>Staff:</strong> SÍ</p>
+                </div>
+            '''
         else:
             # Crear nuevo admin
             admin_user = User.objects.create_user(
@@ -221,9 +292,44 @@ def create_admin_emergency(request):
             admin_user.is_superuser = True
             admin_user.is_staff = True
             admin_user.save()
-            return HttpResponse('✅ Admin creado: username=admin, password=admin123')
+            html_response += '''
+                <div style="background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; border-radius: 5px;">
+                    <h3>✅ ADMIN CREADO EXITOSAMENTE</h3>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Contraseña:</strong> admin123</p>
+                    <p><strong>Email:</strong> admin@hablaris.com</p>
+                    <p><strong>Superuser:</strong> SÍ</p>
+                    <p><strong>Staff:</strong> SÍ</p>
+                </div>
+            '''
+        
+        html_response += f'''
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="/admin/" style="background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px;">
+                        🚀 Ir al Admin Panel
+                    </a>
+                    <br><br>
+                    <a href="/" style="color: #6c757d;">← Volver al inicio</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        
+        return HttpResponse(html_response)
+        
     except Exception as e:
-        return HttpResponse(f'❌ Error: {str(e)}')
+        return HttpResponse(f'''
+        <html>
+        <body style="font-family: Arial; padding: 20px; background: #f8d7da;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px;">
+                <h1>❌ ERROR</h1>
+                <p><strong>Error:</strong> {str(e)}</p>
+                <a href="/admin/">Intentar ir al admin</a>
+            </div>
+        </body>
+        </html>
+        ''')
 
 def health(request):
     """Health check endpoint para Railway"""

@@ -47,6 +47,11 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.up.railway.app',
 ]
 
+# Additional CSRF settings for Railway
+CSRF_COOKIE_SECURE = True if 'RAILWAY_ENVIRONMENT' in os.environ else False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_USE_SESSIONS = False
+
 # Security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = False  # Railway handles this
