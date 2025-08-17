@@ -15,4 +15,5 @@ urlpatterns = [
     path('api/ping/', views.health, name='api_ping'),
     path('create-admin-emergency/', views.create_admin_emergency, name='create_admin_emergency'),  # Vista temporal
     path('admin-simple/', views.admin_login_simple, name='admin_login_simple'),  # Login sin CSRF
+    path('emergency-migrate/', views.emergency_migrate, name='emergency_migrate'),  # Migraciones Railway
 ]

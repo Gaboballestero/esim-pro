@@ -1,5 +1,44 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.core.management import call_command
+from django.db import connection
+import io
+
+def emergency_migrate(request):
+    """Vista de emergencia para aplicar migraciones en Railway"""
+    try:
+        # Capturar output de las migraciones
+        output = io.StringIO()
+        
+        # Ejecutar migraciones
+        call_command('makemigrations', stdout=output)
+        call_command('migrate', stdout=output)
+        
+        migration_output = output.getvalue()
+        
+        html = f"""
+        <h1>🚀 MIGRACIONES APLICADAS EN RAILWAY</h1>
+        <h2>✅ Resultados:</h2>
+        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px;">
+{migration_output}
+        </pre>
+        <br>
+        <h3>🎯 Modelos eSIM listos:</h3>
+        <ul>
+            <li>Country - Países con flags</li>
+            <li>Region - Regiones geográficas</li>  
+            <li>DataPlan - Planes de datos por región</li>
+            <li>ESim - eSIMs de usuarios con seguimiento</li>
+        </ul>
+        <br>
+        <a href="/admin/" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            🔗 IR AL ADMIN AHORA
+        </a>
+        """
+        return HttpResponse(html)
+        
+    except Exception as e:
+        return HttpResponse(f'<h1>❌ Error en migraciones: {e}</h1>')
 
 def emergency_admin(request):
     """Vista de emergencia para crear admin en Railway"""
