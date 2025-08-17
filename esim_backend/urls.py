@@ -10,11 +10,8 @@ urlpatterns = [
     path('shop/', views.shop, name='shop'),
     path('store/', views.store, name='store'),
     path('store/auth/', views.store_auth, name='store_auth'),
-    path('create-admin/', views.create_admin_simple, name='create_admin_simple'),  # Vista SIMPLE
     path('health/', views.health, name='health'),
     path('admin/', admin.site.urls),
     path('api/ping/', views.health, name='api_ping'),
-    # Vistas temporales para debugging en producción
-    path('create-admin-temp/', views.create_admin_view, name='create_admin_temp'),
-    path('debug-templates/', views.debug_templates_view, name='debug_templates'),
+    path('create-admin-emergency/', views.create_admin_emergency, name='create_admin_emergency'),  # Vista temporal
 ]

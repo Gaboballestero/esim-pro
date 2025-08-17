@@ -1,38 +1,18 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 
-def create_admin_simple(request):
-    """Vista SÚPER SIMPLE para crear admin - SIN COMPLICACIONES"""
+def emergency_admin(request):
+    """Vista de emergencia para crear admin en Railway"""
     try:
-        # Borrar admin existente si hay
-        User.objects.filter(username='admin').delete()
-        
-        # Crear admin nuevo
-        admin = User.objects.create_superuser(
-            username='admin',
-            email='admin@hablaris.com',
-            password='admin123'
-        )
-        
-        return HttpResponse(f'''
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family: Arial; text-align: center; padding: 50px;">
-            <h1>✅ ADMIN CREADO EXITOSAMENTE</h1>
-            <div style="background: #f0f0f0; padding: 20px; margin: 20px; border-radius: 10px;">
-                <h2>Credenciales:</h2>
-                <p><strong>Usuario:</strong> admin</p>
-                <p><strong>Contraseña:</strong> admin123</p>
-            </div>
-            <a href="/admin/" style="background: #4CAF50; color: white; padding: 15px 32px; text-decoration: none; font-size: 16px; border-radius: 4px;">
-                🚀 IR AL ADMIN AHORA
-            </a>
-        </body>
-        </html>
-        ''')
+        from django.contrib.auth.models import User
+        # Crear admin si no existe
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@hablaris.com', 'admin123')
+            return HttpResponse('<h1>✅ Admin creado: admin/admin123</h1><a href="/admin/">Ir al admin</a>')
+        else:
+            return HttpResponse('<h1>ℹ️ Admin ya existe: admin/admin123</h1><a href="/admin/">Ir al admin</a>')
     except Exception as e:
-        return HttpResponse(f'<h1>❌ ERROR: {str(e)}</h1>')
+        return HttpResponse(f'<h1>❌ Error: {e}</h1>')
 
 def home(request):
     """Vista principal de la landing page"""
@@ -215,6 +195,35 @@ def shop(request):
 </body>
 </html>"""
     return HttpResponse(html_content)
+
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+
+def create_admin_emergency(request):
+    """Vista de emergencia para crear admin en Railway"""
+    try:
+        # Verificar si ya existe
+        if User.objects.filter(username='admin').exists():
+            admin_user = User.objects.get(username='admin')
+            admin_user.set_password('admin123')
+            admin_user.is_superuser = True
+            admin_user.is_staff = True
+            admin_user.save()
+            return HttpResponse('✅ Admin actualizado: username=admin, password=admin123')
+        else:
+            # Crear nuevo admin
+            admin_user = User.objects.create_user(
+                username='admin',
+                email='admin@hablaris.com',
+                password='admin123'
+            )
+            admin_user.is_superuser = True
+            admin_user.is_staff = True
+            admin_user.save()
+            return HttpResponse('✅ Admin creado: username=admin, password=admin123')
+    except Exception as e:
+        return HttpResponse(f'❌ Error: {str(e)}')
 
 def health(request):
     """Health check endpoint para Railway"""
