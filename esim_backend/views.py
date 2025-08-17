@@ -293,12 +293,238 @@ def shop(request):
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.3; transform: scale(1.3); }
         }
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         .float { animation: float 3s ease-in-out infinite; }
         .pulse-rainbow { animation: pulse-rainbow 2s ease-in-out infinite; }
         .sparkle { animation: sparkle 1.8s ease-in-out infinite; }
+        .slide-up { animation: slideInUp 1s ease-out; }
+        .gradient-text { 
+            background: linear-gradient(45deg, #fbbf24, #f59e0b, #ec4899, #8b5cf6, #3b82f6);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .scroll-section {
+            scroll-margin-top: 2rem;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-x-hidden">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 z-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div class="absolute top-40 right-32 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+        <div class="absolute bottom-32 left-40 w-72 h-72 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
+    </div>
+
+    <!-- Sparkles -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="sparkle absolute top-1/4 left-1/4 w-3 h-3 bg-yellow-400 rounded-full"></div>
+        <div class="sparkle absolute top-1/3 right-1/3 w-2 h-2 bg-blue-400 rounded-full delay-500"></div>
+        <div class="sparkle absolute bottom-1/3 left-1/5 w-2.5 h-2.5 bg-purple-400 rounded-full delay-1000"></div>
+        <div class="sparkle absolute top-1/2 right-1/4 w-2 h-2 bg-pink-400 rounded-full delay-1500"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative z-10 min-h-screen flex items-center justify-center px-4 scroll-section" id="hero">
+        <div class="text-center bg-black/20 backdrop-blur-2xl p-12 rounded-3xl shadow-2xl max-w-4xl mx-4 border border-white/20 pulse-rainbow slide-up">
+            <!-- Floating Shop Icon -->
+            <div class="float mb-8">
+                <div class="text-8xl filter drop-shadow-2xl">🛍️</div>
+            </div>
+            
+            <!-- Main Title -->
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
+                🔥 <span class="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">ACCESO ANTICIPADO</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <div class="text-2xl md:text-3xl text-blue-200 mb-8">
+                ¡La tienda eSIM más esperada del año!
+            </div>
+            
+            <!-- Status Box -->
+            <div class="bg-gradient-to-r from-green-500/20 to-emerald-600/20 backdrop-blur-lg rounded-2xl p-8 mb-12 border border-green-400/40">
+                <div class="text-6xl mb-4">🚀</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    ¡Lanzamiento en Progreso!
+                </h2>
+                <p class="text-xl text-green-200 mb-6">
+                    Estamos activando la tienda más revolucionaria de eSIMs.<br>
+                    <span class="font-bold text-yellow-300">¡Prepárate para precios nunca vistos!</span>
+                </p>
+            </div>
+
+            <!-- Scroll indicator -->
+            <div class="text-white/60 animate-bounce">
+                <div class="text-3xl mb-2">⬇️</div>
+                <div class="text-sm">Desliza para ver más detalles</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Preview Section -->
+    <section class="relative z-10 py-20 px-4 scroll-section" id="plans">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-black text-white mb-6">
+                    Vista Previa - <span class="gradient-text">Próximos Planes</span>
+                </h2>
+                <p class="text-xl text-blue-200">
+                    Los planes eSIM más competitivos del mercado
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-gradient-to-br from-blue-600/30 to-cyan-600/30 backdrop-blur-lg rounded-2xl p-8 border border-blue-400/50 hover:from-blue-500/40 hover:to-cyan-500/40 transition-all duration-500 transform hover:scale-105">
+                    <div class="text-6xl mb-6">🇪🇺</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Europa Total</h3>
+                    <div class="text-4xl text-yellow-400 font-bold mb-4">$29</div>
+                    <div class="text-lg text-blue-200 mb-6">30 países, 15GB, 30 días</div>
+                    <ul class="text-sm text-blue-100 space-y-2">
+                        <li>✅ Francia, España, Italia, Alemania</li>
+                        <li>✅ 5G en ciudades principales</li>
+                        <li>✅ Activación instantánea</li>
+                        <li>✅ Hotspot incluido</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-600/30 to-pink-600/30 backdrop-blur-lg rounded-2xl p-8 border border-purple-400/50 hover:from-purple-500/40 hover:to-pink-500/40 transition-all duration-500 transform hover:scale-105">
+                    <div class="text-6xl mb-6">🌐</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Global Premium</h3>
+                    <div class="text-4xl text-yellow-400 font-bold mb-4">$79</div>
+                    <div class="text-lg text-purple-200 mb-6">150+ países, 50GB, 90 días</div>
+                    <ul class="text-sm text-purple-100 space-y-2">
+                        <li>✅ Cobertura mundial completa</li>
+                        <li>✅ 5G en 80+ países</li>
+                        <li>✅ Soporte 24/7 VIP</li>
+                        <li>✅ Sin límite de velocidad</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-600/30 to-emerald-600/30 backdrop-blur-lg rounded-2xl p-8 border border-green-400/50 hover:from-green-500/40 hover:to-emerald-500/40 transition-all duration-500 transform hover:scale-105">
+                    <div class="text-6xl mb-6">🇺🇸</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">USA & Canadá</h3>
+                    <div class="text-4xl text-yellow-400 font-bold mb-4">$39</div>
+                    <div class="text-lg text-green-200 mb-6">2 países, 25GB, 60 días</div>
+                    <ul class="text-sm text-green-100 space-y-2">
+                        <li>✅ Redes Verizon y AT&T</li>
+                        <li>✅ 5G Ultra Wide Band</li>
+                        <li>✅ Roaming en Canadá</li>
+                        <li>✅ Llamadas incluidas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                    <div class="text-4xl mb-4">🌍</div>
+                    <div class="font-bold text-white text-lg">185+ Países</div>
+                    <div class="text-sm text-gray-300">Cobertura total mundial</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <div class="font-bold text-white text-lg">5G Ultra</div>
+                    <div class="text-sm text-gray-300">Velocidad máxima garantizada</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                    <div class="text-4xl mb-4">💎</div>
+                    <div class="font-bold text-white text-lg">-90% Precio</div>
+                    <div class="text-sm text-gray-300">vs. Roaming tradicional</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Offers Section -->
+    <section class="relative z-10 py-20 px-4 scroll-section" id="offers">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="bg-black/30 backdrop-blur-2xl p-12 rounded-3xl shadow-2xl border border-white/20">
+                <div class="text-7xl mb-8">🎉</div>
+                <h2 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                    ¡OFERTAS DE <span class="gradient-text">LANZAMIENTO</span>!
+                </h2>
+                
+                <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-8 border border-yellow-400/40 mb-8">
+                    <div class="text-2xl font-bold text-white mb-4">
+                        ⏰ Primeros 1000 usuarios obtienen:
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6 text-lg text-yellow-200">
+                        <div>✅ 50% descuento de por vida</div>
+                        <div>✅ Activación gratuita</div>
+                        <div>✅ Soporte VIP exclusivo</div>
+                        <div>✅ Plan de prueba gratis</div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="text-lg text-yellow-300 font-bold">
+                        🔔 ¡NOTIFICACIONES AUTOMÁTICAS ACTIVADAS!
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 justify-center">
+                        <a href="/" class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-12 py-5 rounded-full text-xl font-bold hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-2xl">
+                            ⬅️ Volver al Inicio
+                        </a>
+                        
+                        <a href="/#newsletter" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white px-12 py-5 rounded-full text-xl font-bold transition-all duration-300 transform hover:scale-105 shadow-2xl">
+                            📧 Registro para Noticias
+                        </a>
+                    </div>
+                    
+                    <div class="text-gray-400 text-sm space-y-2">
+                        <p>🔔 Te avisaremos cuando esté listo</p>
+                        <p class="text-green-400">✨ Acceso prioritario garantizado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-12 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-6xl mb-6">🛍️</div>
+            <h3 class="text-3xl font-bold text-white mb-4">
+                La tienda eSIM más revolucionaria está por abrir
+            </h3>
+            <p class="text-xl text-blue-200 mb-8">
+                Septiembre 2025 será el inicio de una nueva era
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="/" class="text-blue-400 hover:text-blue-300 text-lg font-semibold">Inicio</a>
+                <a href="/#newsletter" class="text-yellow-400 hover:text-yellow-300 text-lg font-semibold">Suscribirse</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Elements -->
+    <div class="fixed top-20 left-10 text-4xl opacity-30 float pointer-events-none z-0" style="animation-delay: 1s;">📱</div>
+    <div class="fixed top-40 right-20 text-3xl opacity-40 float pointer-events-none z-0" style="animation-delay: 2s;">🌐</div>
+    <div class="fixed bottom-20 left-20 text-5xl opacity-25 float pointer-events-none z-0" style="animation-delay: 3s;">✈️</div>
+    <div class="fixed bottom-40 right-10 text-4xl opacity-35 float pointer-events-none z-0" style="animation-delay: 0.5s;">🛒</div>
+</body>
+</html>"""
+    return HttpResponse(html_content)
     <!-- Animated Background -->
     <div class="absolute inset-0">
         <div class="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
