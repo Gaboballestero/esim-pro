@@ -1,0 +1,247 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* Estilos para el Dashboard Súper Potente */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.revenue {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card.users {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stat-card.orders {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card.esims {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .stat-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+    }
+    
+    .dashboard-section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        color: #333;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .top-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin: 5px 0;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .item-value {
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+    
+    .quick-action {
+        background: #667eea;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
+    
+    .quick-action:hover {
+        background: #5a6fd8;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .recent-activity {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ dashboard_title }}</h1>
+
+<!-- Estadísticas Principales -->
+<div class="dashboard-stats">
+    <div class="stat-card revenue">
+        <div class="stat-number">${{ stats.total_revenue|floatformat:2 }}</div>
+        <div class="stat-label">💰 Ingresos Totales</div>
+    </div>
+    
+    <div class="stat-card users">
+        <div class="stat-number">{{ stats.total_users }}</div>
+        <div class="stat-label">👥 Usuarios Totales</div>
+        <small style="opacity: 0.8;">{{ stats.premium_users }} premium</small>
+    </div>
+    
+    <div class="stat-card orders">
+        <div class="stat-number">{{ stats.completed_orders }}</div>
+        <div class="stat-label">🛒 Pedidos Completados</div>
+        <small style="opacity: 0.8;">{{ stats.pending_orders }} pendientes</small>
+    </div>
+    
+    <div class="stat-card esims">
+        <div class="stat-number">{{ stats.active_esims }}</div>
+        <div class="stat-label">📱 eSIMs Activas</div>
+        <small style="opacity: 0.8;">de {{ stats.total_esims }} totales</small>
+    </div>
+</div>
+
+<!-- Estadísticas de los últimos 30 días -->
+<div class="dashboard-section">
+    <h2 class="section-title">📈 Últimos 30 días</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="text-align: center; padding: 15px; background: #e8f4fd; border-radius: 8px;">
+            <div style="font-size: 1.8em; font-weight: bold; color: #2980b9;">{{ recent_stats.new_users_30d }}</div>
+            <div>Nuevos Usuarios</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #fff2e5; border-radius: 8px;">
+            <div style="font-size: 1.8em; font-weight: bold; color: #d68910;">{{ recent_stats.orders_30d }}</div>
+            <div>Nuevos Pedidos</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #e8f6f3; border-radius: 8px;">
+            <div style="font-size: 1.8em; font-weight: bold; color: #27ae60;">${{ recent_stats.revenue_30d|floatformat:2 }}</div>
+            <div>Ingresos</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #f4e6ff; border-radius: 8px;">
+            <div style="font-size: 1.8em; font-weight: bold; color: #8e44ad;">{{ recent_stats.activated_esims_30d }}</div>
+            <div>eSIMs Activadas</div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="dashboard-section">
+    <h2 class="section-title">⚡ Acciones Rápidas</h2>
+    <div class="quick-actions">
+        <a href="{% url 'admin:esim_backend_dataplan_add' %}" class="quick-action">➕ Nuevo Plan</a>
+        <a href="{% url 'admin:esim_backend_country_changelist' %}" class="quick-action">🌍 Gestionar Países</a>
+        <a href="{% url 'admin:esim_backend_order_changelist' %}" class="quick-action">🛒 Ver Pedidos</a>
+        <a href="{% url 'admin:esim_backend_esim_changelist' %}" class="quick-action">📱 Monitorear eSIMs</a>
+        <a href="{% url 'admin:esim_backend_user_changelist' %}" class="quick-action">👥 Gestionar Usuarios</a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    <!-- Top Planes -->
+    <div class="dashboard-section">
+        <h2 class="section-title">🔥 Planes Más Vendidos</h2>
+        {% for plan in top_plans %}
+        <div class="top-item">
+            <div>
+                <div class="item-name">{{ plan.name }}</div>
+                <small>${{ plan.price_usd }} - {{ plan.data_amount_gb }}GB</small>
+            </div>
+            <div class="item-value">{{ plan.order_count }} ventas</div>
+        </div>
+        {% empty %}
+        <p style="color: #7f8c8d;">No hay datos de ventas aún</p>
+        {% endfor %}
+    </div>
+    
+    <!-- Top Países -->
+    <div class="dashboard-section">
+        <h2 class="section-title">🌍 Países Más Populares</h2>
+        {% for country in top_countries %}
+        <div class="top-item">
+            <div>
+                <div class="item-name">{{ country.flag_emoji }} {{ country.name }}</div>
+                <small>{{ country.code }}</small>
+            </div>
+            <div class="item-value">{{ country.plan_count }} pedidos</div>
+        </div>
+        {% empty %}
+        <p style="color: #7f8c8d;">No hay datos de países aún</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Top Usuarios -->
+<div class="dashboard-section">
+    <h2 class="section-title">👑 Usuarios que Más Gastan</h2>
+    <div class="recent-activity">
+        {% for user in top_spenders %}
+        <div class="top-item">
+            <div>
+                <div class="item-name">{{ user.username }}</div>
+                <small>{{ user.email }}</small>
+            </div>
+            <div class="item-value">${{ user.total_spent|floatformat:2 }}</div>
+        </div>
+        {% empty %}
+        <p style="color: #7f8c8d;">No hay datos de usuarios aún</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Consumo Promedio -->
+<div class="dashboard-section">
+    <h2 class="section-title">📊 Estadísticas de Uso</h2>
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2em; font-weight: bold; color: #3498db;">{{ avg_data_usage_gb|floatformat:2 }} GB</div>
+        <div style="color: #7f8c8d; margin-top: 5px;">Consumo promedio por eSIM activa</div>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

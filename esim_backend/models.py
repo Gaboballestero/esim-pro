@@ -94,6 +94,26 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username or self.email
+    
+    def get_total_data_used(self):
+        """Retorna el total de datos utilizados por el usuario en GB"""
+        total_mb = sum([esim.data_used_mb for esim in self.esims.all()])
+        return round(total_mb / 1024, 2)
+    get_total_data_used.short_description = 'Datos Usados (GB)'
+    
+    def get_active_esims_count(self):
+        """Retorna el número de eSIMs activas del usuario"""
+        return self.esims.filter(status='activated').count()
+    get_active_esims_count.short_description = 'eSIMs Activas'
+    
+    def get_total_spent(self):
+        """Retorna el total gastado por el usuario"""
+        from django.db.models import Sum
+        total = self.orders.filter(status='completed').aggregate(
+            total=Sum('total_amount')
+        )['total'] or 0
+        return float(total)
+    get_total_spent.short_description = 'Total Gastado ($)'
 
 class Order(models.Model):
     """Modelo de pedidos"""
@@ -136,10 +156,10 @@ class Order(models.Model):
 class ESim(models.Model):
     """Modelo de eSIM generada"""
     ESIM_STATUS = [
-        ('active', 'Activa'),
-        ('inactive', 'Inactiva'),
-        ('expired', 'Expirada'),
+        ('created', 'Creada'),
+        ('activated', 'Activada'),
         ('suspended', 'Suspendida'),
+        ('expired', 'Expirada'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -153,7 +173,7 @@ class ESim(models.Model):
     activation_code = models.CharField(max_length=50)
     
     # Estado y uso
-    status = models.CharField(max_length=20, choices=ESIM_STATUS, default='inactive')
+    status = models.CharField(max_length=20, choices=ESIM_STATUS, default='created')
     data_used_mb = models.BigIntegerField(default=0)
     
     # Fechas importantes
@@ -178,3 +198,13 @@ class ESim(models.Model):
         total_mb = self.plan.data_amount_gb * 1024
         remaining_mb = max(0, total_mb - self.data_used_mb)
         return round(remaining_mb / 1024, 2)
+    
+    @property
+    def usage_percentage(self):
+        """Retorna el porcentaje de uso de datos"""
+        if self.plan.is_unlimited:
+            return 0
+        if self.plan.data_amount_gb > 0:
+            total_mb = self.plan.data_amount_gb * 1024
+            return round((self.data_used_mb / total_mb) * 100, 1)
+        return 0
