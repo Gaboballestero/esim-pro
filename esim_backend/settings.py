@@ -40,6 +40,18 @@ if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
     if railway_public not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(railway_public)
 
+# CSRF Configuration for Railway HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://www.hablaris.com',
+    'https://hablaris.com',
+    'https://*.up.railway.app',
+]
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = False  # Railway handles this
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 DJANGO_APPS = [
     'django.contrib.admin',
