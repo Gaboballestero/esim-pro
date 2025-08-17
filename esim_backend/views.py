@@ -10,35 +10,87 @@ def emergency_migrate(request):
         # Capturar output de las migraciones
         output = io.StringIO()
         
-        # Ejecutar migraciones
-        call_command('makemigrations', stdout=output)
-        call_command('migrate', stdout=output)
+        # Primero hacer makemigrations
+        try:
+            call_command('makemigrations', 'esim_backend', stdout=output)
+            makemigrations_output = output.getvalue()
+        except Exception as e:
+            makemigrations_output = f"Error en makemigrations: {str(e)}"
         
-        migration_output = output.getvalue()
+        # Luego aplicar migrate
+        output2 = io.StringIO()
+        try:
+            call_command('migrate', stdout=output2)
+            migrate_output = output2.getvalue()
+        except Exception as e:
+            migrate_output = f"Error en migrate: {str(e)}"
+        
+        # Verificar si las tablas existen
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'esim_backend_%';")
+        tables = cursor.fetchall()
+        
+        # Verificar si los modelos están registrados
+        from django.contrib import admin
+        from .models import Country, Region, DataPlan, ESim
+        
+        registered_models = []
+        for model in [Country, Region, DataPlan, ESim]:
+            if model in admin.site._registry:
+                registered_models.append(f"✅ {model.__name__}")
+            else:
+                registered_models.append(f"❌ {model.__name__}")
         
         html = f"""
-        <h1>🚀 MIGRACIONES APLICADAS EN RAILWAY</h1>
-        <h2>✅ Resultados:</h2>
-        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px;">
-{migration_output}
+        <html>
+        <head><title>🚀 MIGRACIONES RAILWAY</title></head>
+        <body style="font-family: Arial; margin: 40px;">
+        
+        <h1>🚀 DIAGNÓSTICO Y MIGRACIONES RAILWAY</h1>
+        
+        <h2>📋 MAKEMIGRATIONS:</h2>
+        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+{makemigrations_output}
         </pre>
-        <br>
-        <h3>🎯 Modelos eSIM listos:</h3>
+        
+        <h2>⚡ MIGRATE:</h2>
+        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+{migrate_output}
+        </pre>
+        
+        <h2>🗄️ TABLAS CREADAS:</h2>
         <ul>
-            <li>Country - Países con flags</li>
-            <li>Region - Regiones geográficas</li>  
-            <li>DataPlan - Planes de datos por región</li>
-            <li>ESim - eSIMs de usuarios con seguimiento</li>
+            {''.join([f"<li>📊 {table[0]}</li>" for table in tables]) if tables else "<li>❌ No hay tablas esim_backend</li>"}
         </ul>
+        
+        <h2>📝 MODELOS REGISTRADOS EN ADMIN:</h2>
+        <ul>
+            {''.join([f"<li>{model}</li>" for model in registered_models])}
+        </ul>
+        
+        <br><br>
+        <div style="background: #3b82f6; padding: 20px; border-radius: 10px; text-align: center;">
+            <a href="/admin/" style="color: white; font-size: 18px; text-decoration: none; font-weight: bold;">
+                🎯 IR AL ADMIN AHORA - admin/admin123
+            </a>
+        </div>
+        
         <br>
-        <a href="/admin/" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-            🔗 IR AL ADMIN AHORA
-        </a>
+        <p><strong>🔄 Si no ves los modelos:</strong></p>
+        <ol>
+            <li>Refrescar la página del admin</li>
+            <li>Cerrar sesión y volver a entrar</li>
+            <li>Verificar que las tablas se crearon arriba</li>
+        </ol>
+        
+        </body>
+        </html>
         """
         return HttpResponse(html)
         
     except Exception as e:
-        return HttpResponse(f'<h1>❌ Error en migraciones: {e}</h1>')
+        return HttpResponse(f'<h1>❌ Error crítico: {e}</h1><pre>{str(e.__traceback__)}</pre>')
 
 def emergency_admin(request):
     """Vista de emergencia para crear admin en Railway"""
