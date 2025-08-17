@@ -1,0 +1,112 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+class Country(models.Model):
+    """Países donde están disponibles los eSIMs"""
+    name = models.CharField(max_length=100, help_text="Nombre del país")
+    code = models.CharField(max_length=2, unique=True, help_text="Código ISO del país (US, ES, etc)")
+    flag_emoji = models.CharField(max_length=10, help_text="Emoji de la bandera")
+    is_popular = models.BooleanField(default=False, help_text="Destino popular")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "País"
+        verbose_name_plural = "Países"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.flag_emoji} {self.name}"
+
+class Region(models.Model):
+    """Regiones que agrupan varios países"""
+    name = models.CharField(max_length=100, help_text="Nombre de la región (Europa, Asia, etc)")
+    countries = models.ManyToManyField(Country, help_text="Países incluidos en esta región")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Región"
+        verbose_name_plural = "Regiones"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class DataPlan(models.Model):
+    """Planes de datos eSIM"""
+    PLAN_TYPES = [
+        ('country', 'País Individual'),
+        ('region', 'Regional'),
+        ('global', 'Global'),
+    ]
+
+    name = models.CharField(max_length=200, help_text="Nombre del plan")
+    plan_type = models.CharField(max_length=20, choices=PLAN_TYPES, default='country')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, help_text="Para planes de país")
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, help_text="Para planes regionales")
+    
+    # Detalles del plan
+    data_amount_gb = models.DecimalField(max_digits=8, decimal_places=2, help_text="GB de datos")
+    duration_days = models.IntegerField(help_text="Duración en días")
+    price_usd = models.DecimalField(max_digits=8, decimal_places=2, help_text="Precio en USD")
+    
+    # Características
+    is_unlimited = models.BooleanField(default=False, help_text="Datos ilimitados")
+    is_featured = models.BooleanField(default=False, help_text="Plan destacado")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Plan de Datos"
+        verbose_name_plural = "Planes de Datos"
+        ordering = ['country__name', 'price_usd']
+
+    def __str__(self):
+        destination = self.country.name if self.country else (self.region.name if self.region else "Global")
+        return f"{destination} - {self.data_amount_gb}GB - {self.duration_days}d - ${self.price_usd}"
+
+class ESim(models.Model):
+    """eSIMs comprados por usuarios"""
+    STATUS_CHOICES = [
+        ('created', 'Creada'),
+        ('activated', 'Activada'),
+        ('suspended', 'Suspendida'),
+        ('expired', 'Expirada'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, help_text="Usuario propietario")
+    plan = models.ForeignKey(DataPlan, on_delete=models.CASCADE, help_text="Plan contratado")
+    
+    # Datos de la eSIM
+    iccid = models.CharField(max_length=22, unique=True, help_text="ICCID de la eSIM")
+    qr_code = models.TextField(blank=True, help_text="Datos del código QR")
+    
+    # Estado y fechas
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created')
+    activated_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    
+    # Uso de datos
+    data_used_mb = models.BigIntegerField(default=0, help_text="MB consumidos")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "eSIM"
+        verbose_name_plural = "eSIMs"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.plan.name} - {self.status}"
+
+    @property
+    def data_remaining_mb(self):
+        """MB restantes"""
+        total_mb = float(self.plan.data_amount_gb) * 1024
+        return max(0, total_mb - self.data_used_mb)
+
+    @property
+    def data_remaining_gb(self):
+        """GB restantes"""
+        return round(self.data_remaining_mb / 1024, 2)

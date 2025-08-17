@@ -1,64 +1,99 @@
-{% extends "admin/base_site.html" %}
-{% load i18n static %}
-
-{% block title %}Panel de Administración - Hablaris{% endblock %}
-
-{% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">🚀 Hablaris Admin</a></h1>
-{% endblock %}
-
-{% block content %}
-<div id="content-main">
-    <div class="dashboard">
-        <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
-            <h2>✅ ¡Bienvenido al Admin de Hablaris!</h2>
-            <p>Has iniciado sesión correctamente como administrador.</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hablaris Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .link-item {
+            display: block;
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        .link-item:hover {
+            background: #e9ecef;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .card-link:hover {
+            background: #5a6fd8;
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>🚀 Hablaris Admin</h1>
+        
+        <div class="section">
+            <h3>👤 Información de Sesión</h3>
             <p><strong>Usuario:</strong> {{ user.username }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Estado:</strong> Administrador Activo</p>
         </div>
 
-        <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007cba;">
-            <h3>🔧 Funciones Administrativas</h3>
-            <ul style="list-style: none; padding: 0;">
-                <li style="margin: 10px 0;">
-                    <a href="{% url 'admin:auth_user_changelist' %}" style="color: #007cba; text-decoration: none;">
-                        👥 Gestionar Usuarios
-                    </a>
-                </li>
-                <li style="margin: 10px 0;">
-                    <a href="{% url 'admin:auth_group_changelist' %}" style="color: #007cba; text-decoration: none;">
-                        🏷️ Gestionar Grupos
-                    </a>
-                </li>
-            </ul>
+        <div class="section">
+            <h3>👥 Gestión de Usuarios</h3>
+            <a href="/admin/auth/user/" class="link-item">
+                <strong>Ver Usuarios</strong><br>
+                <small>Administrar cuentas de usuarios registrados</small>
+            </a>
+            <a href="/admin/auth/group/" class="link-item">
+                <strong>Grupos y Permisos</strong><br>
+                <small>Gestionar grupos de permisos</small>
+            </a>
         </div>
 
-        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-            <h3>🚀 Enlaces Rápidos de la Plataforma</h3>
-            <ul style="list-style: none; padding: 0;">
-                <li style="margin: 10px 0;">
-                    <a href="/" style="color: #007cba; text-decoration: none;">
-                        🏠 Landing Page Principal
-                    </a>
-                </li>
-                <li style="margin: 10px 0;">
-                    <a href="/store/" style="color: #007cba; text-decoration: none;">
-                        🛒 Tienda eSIM
-                    </a>
-                </li>
-                <li style="margin: 10px 0;">
-                    <a href="/shop/" style="color: #007cba; text-decoration: none;">
-                        👁️ Vista Previa de la Tienda
-                    </a>
-                </li>
-            </ul>
+        <div class="section">
+            <h3>🌐 Plataforma</h3>
+            <a href="/" class="link-item">
+                <strong>Landing Page</strong><br>
+                <small>Página principal de Hablaris</small>
+            </a>
+            <a href="/store/" class="link-item">
+                <strong>Tienda eSIM</strong><br>
+                <small>Tienda funcional con filtros avanzados</small>
+            </a>
+            <a href="/shop/" class="link-item">
+                <strong>Vista Previa</strong><br>
+                <small>Demostración de la tienda</small>
+            </a>
         </div>
 
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <small style="color: #6c757d;">
-                Panel de administración simplificado - Hablaris eSIM Platform
-            </small>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/admin/logout/" style="background: #dc3545; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px;">
+                🚪 Cerrar Sesión
+            </a>
         </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
