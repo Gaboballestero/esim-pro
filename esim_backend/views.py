@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 def home(request):
     """Vista principal de la landing page"""
@@ -202,45 +202,15 @@ def store_auth(request):
             # Establecer sesión temporal
             request.session['store_access'] = True
             request.session['dev_user'] = username
-            return HttpResponse('<script>window.location.href="/store/"</script>')
+            return redirect('/store/')
         else:
-            return HttpResponse('<script>alert("Acceso denegado"); window.location.href="/"</script>')
+            # Error con mensaje más claro
+            return render(request, 'store_auth.html', {
+                'error': 'Credenciales incorrectas. Usuario: hablaris_dev'
+            })
     
-    html_content = """<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Restringido - Hablaris Store</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
-    <div class="bg-black/20 backdrop-blur-2xl p-8 rounded-2xl shadow-2xl border border-white/20 max-w-md w-full mx-4">
-        <div class="text-center mb-8">
-            <div class="text-6xl mb-4">🔐</div>
-            <h1 class="text-2xl font-bold text-white mb-2">Acceso Restringido</h1>
-            <p class="text-gray-300">Tienda en desarrollo - Solo personal autorizado</p>
-        </div>
-        
-        <form method="post" class="space-y-4">
-            <div>
-                <input type="text" name="username" placeholder="Usuario" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400" required>
-            </div>
-            <div>
-                <input type="password" name="password" placeholder="Contraseña" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400" required>
-            </div>
-            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all">
-                Acceder a la Tienda
-            </button>
-        </form>
-        
-        <div class="text-center mt-6">
-            <a href="/" class="text-blue-400 hover:text-blue-300 text-sm">← Volver al inicio</a>
-        </div>
-    </div>
-</body>
-</html>"""
-    return HttpResponse(html_content)
+    # Template con CSRF token
+    return render(request, 'store_auth.html')
 
 def store(request):
     """Tienda eSIM funcional con filtros avanzados inspirada en Holafly/Nomad pero mejorada"""

@@ -52,12 +52,10 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
-    'rest_framework.authtoken',
     'corsheaders',
 ]
 
 LOCAL_APPS = [
-    'esim_backend',  # App principal con modelos y APIs
     # Apps locales desactivadas temporalmente para deployment inicial
     # 'users',  # Sistema de usuarios personalizado
     # 'plans',  # Planes de datos
@@ -87,7 +85,7 @@ ROOT_URLCONF = 'esim_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'esim_backend' / 'templates'],  # Templates personalizados para admin
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -169,7 +167,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # Permitir acceso público por defecto
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -196,15 +194,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://web-production-c64b6.up.railway.app",
 ]
 
-# CSRF configuration - ARREGLAR CSRF ERROR DEL ADMIN
-CSRF_TRUSTED_ORIGINS = [
-    "https://hablaris.com",
-    "https://www.hablaris.com", 
-    "https://web-production-c64b6.up.railway.app",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
-
 # Add custom CORS origins from environment variable
 cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
 if cors_origins_env:
@@ -218,7 +207,7 @@ if cors_origins_env:
 #     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Comentamos el modelo custom user por ahora - usar el default de Django
-AUTH_USER_MODEL = 'esim_backend.User'
+# AUTH_USER_MODEL = 'users.User'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
