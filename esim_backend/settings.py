@@ -196,6 +196,15 @@ CORS_ALLOWED_ORIGINS = [
     "https://web-production-c64b6.up.railway.app",
 ]
 
+# CSRF configuration - ARREGLAR CSRF ERROR DEL ADMIN
+CSRF_TRUSTED_ORIGINS = [
+    "https://hablaris.com",
+    "https://www.hablaris.com", 
+    "https://web-production-c64b6.up.railway.app",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
 # Add custom CORS origins from environment variable
 cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
 if cors_origins_env:
