@@ -1,0 +1,120 @@
+{% extends "admin/login.html" %}
+{% load i18n static %}
+
+{% block title %}Hablaris Admin - Login{% endblock %}
+
+{% block branding %}
+<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: -20px -20px 20px -20px; border-radius: 0 0 10px 10px;">
+    <h1 style="color: white; font-size: 2.2em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+        🚀 HABLARIS ADMIN
+    </h1>
+    <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">
+        Panel de Administración eSIM
+    </p>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .login {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 40px;
+        max-width: 400px;
+        margin: 20px auto;
+    }
+    
+    .form-row input[type="text"], .form-row input[type="password"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    .form-row input[type="text"]:focus, .form-row input[type="password"]:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .submit-row input[type="submit"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-row input[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .form-row label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .errornote {
+        background: #fed7d7;
+        border: 1px solid #f56565;
+        color: #c53030;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="info-panel" style="background: #e6fffa; border: 2px solid #38b2ac; border-radius: 10px; padding: 20px; margin-bottom: 30px; text-align: center;">
+    <div style="font-size: 2em; margin-bottom: 10px;">🔑</div>
+    <h3 style="color: #2d3748; margin: 0 0 10px 0;">Acceso Administrativo</h3>
+    
+    <div style="background: #f7fafc; border-radius: 8px; padding: 15px; margin: 15px 0;">
+        <div style="color: #4a5568; font-size: 14px; margin-bottom: 8px;">
+            <strong>🎯 Credenciales de Admin:</strong>
+        </div>
+        <div style="color: #2d3748; font-family: monospace;">
+            <div><strong>Usuario:</strong> admin</div>
+            <div><strong>Contraseña:</strong> HablarisAdmin2025!</div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #b2f5ea;">
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <div style="color: #667eea; font-size: 1.2em;">🛒</div>
+                <small style="color: #718096;">Tienda</small>
+                <br><a href="/store/" style="color: #667eea; text-decoration: none; font-size: 0.9em;">/store/</a>
+            </div>
+            <div>
+                <div style="color: #667eea; font-size: 1.2em;">🏠</div>
+                <small style="color: #718096;">Landing</small>
+                <br><a href="/" style="color: #667eea; text-decoration: none; font-size: 0.9em;">hablaris.com</a>
+            </div>
+            <div>
+                <div style="color: #667eea; font-size: 1.2em;">🔧</div>
+                <small style="color: #718096;">Dev Login</small>
+                <br><a href="/store/auth/" style="color: #667eea; text-decoration: none; font-size: 0.9em;">/store/auth/</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
