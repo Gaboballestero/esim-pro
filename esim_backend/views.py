@@ -2,127 +2,37 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 
-def create_admin_user(request):
-    """Vista temporal para crear admin user en producción - SOLO PARA DESARROLLO"""
+def create_admin_simple(request):
+    """Vista SÚPER SIMPLE para crear admin - SIN COMPLICACIONES"""
     try:
-        # Verificar si ya existe
-        if User.objects.filter(username='admin').exists():
-            admin_user = User.objects.get(username='admin')
-            # Actualizar contraseña
-            admin_user.set_password('admin123')
-            admin_user.save()
-            return JsonResponse({
-                'status': 'updated',
-                'message': 'Usuario admin actualizado',
-                'username': 'admin',
-                'password': 'admin123',
-                'login_url': '/admin/'
-            })
-        else:
-            # Crear nuevo usuario admin
-            admin_user = User.objects.create_superuser(
-                username='admin',
-                email='admin@hablaris.com',
-                password='admin123'
-            )
-            return JsonResponse({
-                'status': 'created',
-                'message': 'Usuario admin creado',
-                'username': 'admin',
-                'password': 'admin123',
-                'login_url': '/admin/'
-            })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        })
-
-def create_admin_view(request):
-    """Vista temporal para crear admin en producción"""
-    if request.method == 'POST':
-        try:
-            from django.contrib.auth.models import User
-            # Crear admin si no existe
-            if not User.objects.filter(username='admin').exists():
-                admin_user = User.objects.create_superuser(
-                    username='admin',
-                    email='admin@hablaris.com',
-                    password='HablarisAdmin2025!'
-                )
-                return HttpResponse(f'''
-                <div style="background: green; color: white; padding: 20px; text-align: center;">
-                    <h2>✅ ADMIN CREADO EXITOSAMENTE</h2>
-                    <p><strong>Usuario:</strong> admin</p>
-                    <p><strong>Contraseña:</strong> HablarisAdmin2025!</p>
-                    <p><strong>Email:</strong> admin@hablaris.com</p>
-                    <a href="/admin/" style="color: white; text-decoration: underline;">Ir al Admin →</a>
-                </div>
-                ''')
-            else:
-                # Admin existe, actualizar contraseña
-                admin_user = User.objects.get(username='admin')
-                admin_user.set_password('HablarisAdmin2025!')
-                admin_user.save()
-                return HttpResponse(f'''
-                <div style="background: orange; color: white; padding: 20px; text-align: center;">
-                    <h2>🔄 CONTRASEÑA ACTUALIZADA</h2>
-                    <p><strong>Usuario:</strong> admin</p>
-                    <p><strong>Nueva Contraseña:</strong> HablarisAdmin2025!</p>
-                    <a href="/admin/" style="color: white; text-decoration: underline;">Ir al Admin →</a>
-                </div>
-                ''')
-        except Exception as e:
-            return HttpResponse(f'''
-            <div style="background: red; color: white; padding: 20px; text-align: center;">
-                <h2>❌ ERROR</h2>
-                <p>{str(e)}</p>
+        # Borrar admin existente si hay
+        User.objects.filter(username='admin').delete()
+        
+        # Crear admin nuevo
+        admin = User.objects.create_superuser(
+            username='admin',
+            email='admin@hablaris.com',
+            password='admin123'
+        )
+        
+        return HttpResponse(f'''
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+            <h1>✅ ADMIN CREADO EXITOSAMENTE</h1>
+            <div style="background: #f0f0f0; padding: 20px; margin: 20px; border-radius: 10px;">
+                <h2>Credenciales:</h2>
+                <p><strong>Usuario:</strong> admin</p>
+                <p><strong>Contraseña:</strong> admin123</p>
             </div>
-            ''')
-    
-    return HttpResponse('''
-    <div style="background: #f0f0f0; padding: 50px; text-align: center; font-family: Arial;">
-        <h2>🔧 Crear Admin en Producción</h2>
-        <p>Esta página crea el usuario admin en la base de datos de producción</p>
-        <form method="post" style="margin-top: 30px;">
-            <input type="hidden" name="csrfmiddlewaretoken" value="dummy">
-            <button type="submit" style="background: #007cba; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-                🚀 Crear/Actualizar Admin
-            </button>
-        </form>
-    </div>
-    ''')
-
-def debug_templates_view(request):
-    """Vista para debuggear templates en producción"""
-    import os
-    from django.conf import settings
-    
-    template_dirs = []
-    for template_dir in settings.TEMPLATES[0]['DIRS']:
-        template_dirs.append(str(template_dir))
-    
-    admin_template_path = None
-    for template_dir in settings.TEMPLATES[0]['DIRS']:
-        admin_path = os.path.join(template_dir, 'admin', 'login.html')
-        if os.path.exists(admin_path):
-            admin_template_path = admin_path
-            break
-    
-    return HttpResponse(f'''
-    <div style="background: #f0f0f0; padding: 30px; font-family: monospace;">
-        <h2>🔍 DEBUG TEMPLATES</h2>
-        <p><strong>TEMPLATE_DIRS:</strong></p>
-        <ul>{"".join([f"<li>{d}</li>" for d in template_dirs])}</ul>
-        
-        <p><strong>Admin template path:</strong></p>
-        <p>{admin_template_path if admin_template_path else "❌ NO ENCONTRADO"}</p>
-        
-        <p><strong>BASE_DIR:</strong> {settings.BASE_DIR}</p>
-        
-        <a href="/admin/" style="color: blue;">→ Ir al Admin</a>
-    </div>
-    ''')
+            <a href="/admin/" style="background: #4CAF50; color: white; padding: 15px 32px; text-decoration: none; font-size: 16px; border-radius: 4px;">
+                🚀 IR AL ADMIN AHORA
+            </a>
+        </body>
+        </html>
+        ''')
+    except Exception as e:
+        return HttpResponse(f'<h1>❌ ERROR: {str(e)}</h1>')
 
 def home(request):
     """Vista principal de la landing page"""
