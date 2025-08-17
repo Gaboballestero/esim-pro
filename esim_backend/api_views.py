@@ -6,7 +6,7 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
+# from django_filters.rest_framework import DjangoFilterBackend  # Temporalmente deshabilitado
 from django.db.models import Q
 from .models import Country, DataPlan, Order, ESim, User
 from .serializers import (
@@ -59,7 +59,7 @@ class DataPlanViewSet(viewsets.ReadOnlyModelViewSet):
     """API para planes eSIM"""
     queryset = DataPlan.objects.filter(is_active=True)
     permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # Temporalmente sin DjangoFilterBackend
     search_fields = ['name', 'countries__name', 'countries__code']
     ordering_fields = ['price_usd', 'data_amount_gb', 'validity_days', 'created_at']
     
