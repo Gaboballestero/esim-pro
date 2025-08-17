@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    'esim_backend',  # App principal (necesaria para evitar errores de modelos)
     # Apps locales desactivadas temporalmente para deployment inicial
     # 'users',  # Sistema de usuarios personalizado
     # 'plans',  # Planes de datos
