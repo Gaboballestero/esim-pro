@@ -13,4 +13,7 @@ urlpatterns = [
     path('health/', views.health, name='health'),
     path('admin/', admin.site.urls),
     path('api/ping/', views.health, name='api_ping'),
+    # Vistas temporales para debugging en producción
+    path('create-admin-temp/', views.create_admin_view, name='create_admin_temp'),
+    path('debug-templates/', views.debug_templates_view, name='debug_templates'),
 ]

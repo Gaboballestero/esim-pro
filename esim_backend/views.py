@@ -1,6 +1,92 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
+def create_admin_view(request):
+    """Vista temporal para crear admin en producción"""
+    if request.method == 'POST':
+        try:
+            from django.contrib.auth.models import User
+            # Crear admin si no existe
+            if not User.objects.filter(username='admin').exists():
+                admin_user = User.objects.create_superuser(
+                    username='admin',
+                    email='admin@hablaris.com',
+                    password='HablarisAdmin2025!'
+                )
+                return HttpResponse(f'''
+                <div style="background: green; color: white; padding: 20px; text-align: center;">
+                    <h2>✅ ADMIN CREADO EXITOSAMENTE</h2>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Contraseña:</strong> HablarisAdmin2025!</p>
+                    <p><strong>Email:</strong> admin@hablaris.com</p>
+                    <a href="/admin/" style="color: white; text-decoration: underline;">Ir al Admin →</a>
+                </div>
+                ''')
+            else:
+                # Admin existe, actualizar contraseña
+                admin_user = User.objects.get(username='admin')
+                admin_user.set_password('HablarisAdmin2025!')
+                admin_user.save()
+                return HttpResponse(f'''
+                <div style="background: orange; color: white; padding: 20px; text-align: center;">
+                    <h2>🔄 CONTRASEÑA ACTUALIZADA</h2>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Nueva Contraseña:</strong> HablarisAdmin2025!</p>
+                    <a href="/admin/" style="color: white; text-decoration: underline;">Ir al Admin →</a>
+                </div>
+                ''')
+        except Exception as e:
+            return HttpResponse(f'''
+            <div style="background: red; color: white; padding: 20px; text-align: center;">
+                <h2>❌ ERROR</h2>
+                <p>{str(e)}</p>
+            </div>
+            ''')
+    
+    return HttpResponse('''
+    <div style="background: #f0f0f0; padding: 50px; text-align: center; font-family: Arial;">
+        <h2>🔧 Crear Admin en Producción</h2>
+        <p>Esta página crea el usuario admin en la base de datos de producción</p>
+        <form method="post" style="margin-top: 30px;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="dummy">
+            <button type="submit" style="background: #007cba; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                🚀 Crear/Actualizar Admin
+            </button>
+        </form>
+    </div>
+    ''')
+
+def debug_templates_view(request):
+    """Vista para debuggear templates en producción"""
+    import os
+    from django.conf import settings
+    
+    template_dirs = []
+    for template_dir in settings.TEMPLATES[0]['DIRS']:
+        template_dirs.append(str(template_dir))
+    
+    admin_template_path = None
+    for template_dir in settings.TEMPLATES[0]['DIRS']:
+        admin_path = os.path.join(template_dir, 'admin', 'login.html')
+        if os.path.exists(admin_path):
+            admin_template_path = admin_path
+            break
+    
+    return HttpResponse(f'''
+    <div style="background: #f0f0f0; padding: 30px; font-family: monospace;">
+        <h2>🔍 DEBUG TEMPLATES</h2>
+        <p><strong>TEMPLATE_DIRS:</strong></p>
+        <ul>{"".join([f"<li>{d}</li>" for d in template_dirs])}</ul>
+        
+        <p><strong>Admin template path:</strong></p>
+        <p>{admin_template_path if admin_template_path else "❌ NO ENCONTRADO"}</p>
+        
+        <p><strong>BASE_DIR:</strong> {settings.BASE_DIR}</p>
+        
+        <a href="/admin/" style="color: blue;">→ Ir al Admin</a>
+    </div>
+    ''')
+
 def home(request):
     """Vista principal de la landing page"""
     html_content = """<!DOCTYPE html>
