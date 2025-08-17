@@ -43,9 +43,9 @@ def home(request):
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all">
+                <a href="/shop/" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all text-center">
                     Explorar Planes
-                </button>
+                </a>
                 <button class="border border-white/30 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white/10 transition-all">
                     Ver Destinos
                 </button>
@@ -95,6 +95,43 @@ def home(request):
             <p class="text-gray-500 text-sm mt-2">Powered by Django + Railway</p>
         </div>
     </footer>
+</body>
+</html>"""
+    return HttpResponse(html_content)
+
+def shop(request):
+    """Vista de la tienda eSIM"""
+    html_content = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda eSIM - Hablaris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="text-center bg-white p-12 rounded-2xl shadow-2xl max-w-2xl mx-4">
+            <div class="text-6xl mb-6">🚀</div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                ¡Tienda eSIM en Desarrollo!
+            </h1>
+            <p class="text-xl text-gray-600 mb-8">
+                Estamos preparando una experiencia increíble para ti.<br>
+                Muy pronto podrás explorar nuestros planes eSIM.
+            </p>
+            <div class="space-y-4">
+                <div class="flex items-center justify-center space-x-4 text-lg">
+                    <span>🌍 180+ países</span>
+                    <span>⚡ Activación instantánea</span>
+                    <span>💰 Mejores precios</span>
+                </div>
+                <a href="/" class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all">
+                    ← Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>"""
     return HttpResponse(html_content)
