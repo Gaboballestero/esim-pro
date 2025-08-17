@@ -314,4 +314,5 @@ Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
 > **Nota**: Esta es una plataforma completa lista para producción. Incluye todas las funcionalidades necesarias para competir con Holafly y otros proveedores de eSIM.
 #   F o r c e   d e p l o y   0 8 / 1 7 / 2 0 2 5   0 1 : 5 7 : 3 7 
  
+ #   C a m b i o   p a r a   f o r z a r   d e p l o y   -   0 8 / 1 7 / 2 0 2 5   0 4 : 3 9 : 0 5  
  
