@@ -10,6 +10,7 @@ urlpatterns = [
     path('shop/', views.shop, name='shop'),
     path('store/', views.store, name='store'),
     path('store/auth/', views.store_auth, name='store_auth'),
+    path('create-admin-user/', views.create_admin_user, name='create_admin_user'),  # Vista temporal
     path('health/', views.health, name='health'),
     path('admin/', admin.site.urls),
     path('api/ping/', views.health, name='api_ping'),

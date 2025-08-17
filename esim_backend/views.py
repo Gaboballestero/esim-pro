@@ -1,5 +1,42 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+
+def create_admin_user(request):
+    """Vista temporal para crear admin user en producción - SOLO PARA DESARROLLO"""
+    try:
+        # Verificar si ya existe
+        if User.objects.filter(username='admin').exists():
+            admin_user = User.objects.get(username='admin')
+            # Actualizar contraseña
+            admin_user.set_password('admin123')
+            admin_user.save()
+            return JsonResponse({
+                'status': 'updated',
+                'message': 'Usuario admin actualizado',
+                'username': 'admin',
+                'password': 'admin123',
+                'login_url': '/admin/'
+            })
+        else:
+            # Crear nuevo usuario admin
+            admin_user = User.objects.create_superuser(
+                username='admin',
+                email='admin@hablaris.com',
+                password='admin123'
+            )
+            return JsonResponse({
+                'status': 'created',
+                'message': 'Usuario admin creado',
+                'username': 'admin',
+                'password': 'admin123',
+                'login_url': '/admin/'
+            })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        })
 
 def create_admin_view(request):
     """Vista temporal para crear admin en producción"""
