@@ -268,38 +268,53 @@ def create_admin_emergency(request):
         
         # Verificar si ya existe
         if User.objects.filter(username='admin').exists():
-            admin_user = User.objects.get(username='admin')
-            admin_user.set_password('admin123')
-            admin_user.is_superuser = True
-            admin_user.is_staff = True
-            admin_user.save()
-            html_response += '''
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px;">
-                    <h3>✅ ADMIN ACTUALIZADO EXITOSAMENTE</h3>
-                    <p><strong>Usuario:</strong> admin</p>
-                    <p><strong>Contraseña:</strong> admin123</p>
-                    <p><strong>Superuser:</strong> SÍ</p>
-                    <p><strong>Staff:</strong> SÍ</p>
-                </div>
-            '''
-        else:
-            # Crear nuevo admin
-            admin_user = User.objects.create_user(
+            # Eliminar y recrear para estar seguros
+            User.objects.filter(username='admin').delete()
+            
+            admin_user = User.objects.create_superuser(
                 username='admin',
                 email='admin@hablaris.com',
                 password='admin123'
             )
-            admin_user.is_superuser = True
-            admin_user.is_staff = True
-            admin_user.save()
-            html_response += '''
+            
+            # Test de autenticación
+            from django.contrib.auth import authenticate
+            test_login = authenticate(username='admin', password='admin123')
+            
+            html_response += f'''
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px;">
+                    <h3>✅ ADMIN RECREADO EXITOSAMENTE</h3>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Contraseña:</strong> admin123</p>
+                    <p><strong>Superuser:</strong> {admin_user.is_superuser}</p>
+                    <p><strong>Staff:</strong> {admin_user.is_staff}</p>
+                    <p><strong>Test Login:</strong> {"✅ FUNCIONA" if test_login else "❌ FALLA"}</p>
+                </div>
+            '''
+        else:
+            # Crear nuevo admin FORZADO
+            # Eliminar cualquier admin existente primero
+            User.objects.filter(username='admin').delete()
+            
+            admin_user = User.objects.create_superuser(
+                username='admin',
+                email='admin@hablaris.com',
+                password='admin123'
+            )
+            
+            # Verificar que funciona la autenticación
+            from django.contrib.auth import authenticate
+            test_login = authenticate(username='admin', password='admin123')
+            
+            html_response += f'''
                 <div style="background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; border-radius: 5px;">
                     <h3>✅ ADMIN CREADO EXITOSAMENTE</h3>
                     <p><strong>Usuario:</strong> admin</p>
                     <p><strong>Contraseña:</strong> admin123</p>
                     <p><strong>Email:</strong> admin@hablaris.com</p>
-                    <p><strong>Superuser:</strong> SÍ</p>
-                    <p><strong>Staff:</strong> SÍ</p>
+                    <p><strong>Superuser:</strong> {admin_user.is_superuser}</p>
+                    <p><strong>Staff:</strong> {admin_user.is_staff}</p>
+                    <p><strong>Test Login:</strong> {"✅ FUNCIONA" if test_login else "❌ FALLA"}</p>
                 </div>
             '''
         
