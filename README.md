@@ -7,7 +7,14 @@ Una plataforma completa de gestión de eSIM para turistas, similar a Holafly, co
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
 ![React Native](https://img.shields.io/badge/React%20Native-Expo-blue)
 
-## 🚀 Características
+## �️ Nueva Tienda /store/ Disponible
+**URLS Activas:**
+- `/` - Landing page principal
+- `/shop/` - Vista previa de acceso anticipado  
+- `/store/` - **NUEVA** Tienda funcional completa
+- `/store/auth/` - Login para desarrollo
+
+## �🚀 Características
 
 ### ✨ Para Usuarios
 - **Autenticación simplificada** - Login/registro unificado
@@ -305,5 +312,6 @@ Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
 ## 🚀 **¡Desarrollado con ❤️ para conectar el mundo!**
 
 > **Nota**: Esta es una plataforma completa lista para producción. Incluye todas las funcionalidades necesarias para competir con Holafly y otros proveedores de eSIM.
-#   F o r c e   d e p l o y   0 8 / 1 7 / 2 0 2 5   0 1 : 5 7 : 3 7  
+#   F o r c e   d e p l o y   0 8 / 1 7 / 2 0 2 5   0 1 : 5 7 : 3 7 
+ 
  

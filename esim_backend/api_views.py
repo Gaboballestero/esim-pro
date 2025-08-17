@@ -1,7 +1,21 @@
 """
-API Views para tests de Twilio Super SIM
+API ViewSets completos para la tienda eSIM
 """
 
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
+from .models import Country, DataPlan, Order, ESim, User
+from .serializers import (
+    CountrySerializer, DataPlanListSerializer, DataPlanDetailSerializer,
+    OrderSerializer, OrderCreateSerializer, ESimSerializer,
+    UserRegistrationSerializer, UserProfileSerializer, PlanFilterSerializer
+)
+
+# Legacy imports for backwards compatibility
 import os
 import json
 from django.http import JsonResponse
@@ -12,6 +26,247 @@ from django.views import View
 import logging
 
 logger = logging.getLogger(__name__)
+
+# ===== NUEVAS API VIEWSETS PARA LA TIENDA =====
+
+class CountryViewSet(viewsets.ReadOnlyModelViewSet):
+    """API para países disponibles"""
+    queryset = Country.objects.filter(is_active=True)
+    serializer_class = CountrySerializer
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'code']
+    ordering_fields = ['name', 'region']
+    
+    @action(detail=False, methods=['get'])
+    def popular(self, request):
+        """Obtener países populares"""
+        popular_countries = self.queryset.filter(is_popular=True)
+        serializer = self.get_serializer(popular_countries, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def regions(self, request):
+        """Obtener países agrupados por región"""
+        regions = {}
+        for country in self.queryset.all():
+            if country.region not in regions:
+                regions[country.region] = []
+            regions[country.region].append(CountrySerializer(country).data)
+        return Response(regions)
+
+class DataPlanViewSet(viewsets.ReadOnlyModelViewSet):
+    """API para planes eSIM"""
+    queryset = DataPlan.objects.filter(is_active=True)
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'countries__name', 'countries__code']
+    ordering_fields = ['price_usd', 'data_amount_gb', 'validity_days', 'created_at']
+    
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return DataPlanDetailSerializer
+        return DataPlanListSerializer
+    
+    @action(detail=False, methods=['post'])
+    def filter(self, request):
+        """Filtrar planes con parámetros avanzados"""
+        filter_serializer = PlanFilterSerializer(data=request.data)
+        if not filter_serializer.is_valid():
+            return Response(filter_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        filters = filter_serializer.validated_data
+        queryset = self.get_queryset()
+        
+        # Filtros por países
+        if 'countries' in filters:
+            queryset = queryset.filter(countries__code__in=filters['countries']).distinct()
+        
+        # Filtros por datos
+        if 'min_data' in filters:
+            queryset = queryset.filter(data_amount_gb__gte=filters['min_data'])
+        if 'max_data' in filters:
+            queryset = queryset.filter(data_amount_gb__lte=filters['max_data'])
+        
+        # Filtros por duración
+        if 'min_days' in filters:
+            queryset = queryset.filter(validity_days__gte=filters['min_days'])
+        if 'max_days' in filters:
+            queryset = queryset.filter(validity_days__lte=filters['max_days'])
+        
+        # Filtros por precio
+        if 'min_price' in filters:
+            queryset = queryset.filter(price_usd__gte=filters['min_price'])
+        if 'max_price' in filters:
+            queryset = queryset.filter(price_usd__lte=filters['max_price'])
+        
+        # Filtros por tipo
+        if 'plan_type' in filters:
+            queryset = queryset.filter(plan_type=filters['plan_type'])
+        
+        # Filtros por características
+        if 'supports_5g' in filters:
+            queryset = queryset.filter(supports_5g=filters['supports_5g'])
+        if 'supports_hotspot' in filters:
+            queryset = queryset.filter(supports_hotspot=filters['supports_hotspot'])
+        if 'includes_calls' in filters:
+            queryset = queryset.filter(includes_calls=filters['includes_calls'])
+        if 'includes_sms' in filters:
+            queryset = queryset.filter(includes_sms=filters['includes_sms'])
+        
+        # Filtros por marketing
+        if 'is_popular' in filters:
+            queryset = queryset.filter(is_popular=filters['is_popular'])
+        if 'is_featured' in filters:
+            queryset = queryset.filter(is_featured=filters['is_featured'])
+        
+        # Búsqueda por texto
+        if 'search' in filters:
+            search_term = filters['search']
+            queryset = queryset.filter(
+                Q(name__icontains=search_term) |
+                Q(countries__name__icontains=search_term) |
+                Q(network_operators__icontains=search_term)
+            ).distinct()
+        
+        # Paginación
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'count': queryset.count(),
+            'results': serializer.data
+        })
+    
+    @action(detail=False, methods=['get'])
+    def featured(self, request):
+        """Obtener planes destacados"""
+        featured_plans = self.queryset.filter(is_featured=True)[:6]
+        serializer = self.get_serializer(featured_plans, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def popular(self, request):
+        """Obtener planes populares"""
+        popular_plans = self.queryset.filter(is_popular=True)[:8]
+        serializer = self.get_serializer(popular_plans, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def by_country(self, request):
+        """Obtener planes por país"""
+        country_code = request.query_params.get('country')
+        if not country_code:
+            return Response(
+                {'error': 'Parámetro country es requerido'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        plans = self.queryset.filter(countries__code=country_code)
+        serializer = self.get_serializer(plans, many=True)
+        return Response(serializer.data)
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """API para pedidos"""
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return OrderCreateSerializer
+        return OrderSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """Cancelar pedido"""
+        order = self.get_object()
+        if order.status in ['pending', 'processing']:
+            order.status = 'failed'
+            order.save()
+            return Response({'message': 'Pedido cancelado'})
+        return Response(
+            {'error': 'No se puede cancelar este pedido'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+class ESimViewSet(viewsets.ReadOnlyModelViewSet):
+    """API para eSIMs del usuario"""
+    serializer_class = ESimSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return ESim.objects.filter(user=self.request.user)
+    
+    @action(detail=True, methods=['get'])
+    def qr_code(self, request, pk=None):
+        """Obtener código QR de la eSIM"""
+        esim = self.get_object()
+        return Response({
+            'qr_code': esim.qr_code,
+            'activation_code': esim.activation_code,
+            'iccid': esim.iccid
+        })
+    
+    @action(detail=True, methods=['get'])
+    def usage(self, request, pk=None):
+        """Obtener uso de datos de la eSIM"""
+        esim = self.get_object()
+        return Response({
+            'data_used_gb': esim.data_used_gb,
+            'data_remaining_gb': esim.data_remaining_gb,
+            'total_data_gb': esim.plan.data_amount_gb,
+            'is_unlimited': esim.plan.is_unlimited,
+            'expires_at': esim.expires_at,
+            'status': esim.status
+        })
+
+class UserViewSet(viewsets.ModelViewSet):
+    """API para gestión de usuarios"""
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
+    
+    def get_object(self):
+        return self.request.user
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def register(self, request):
+        """Registro de nuevo usuario"""
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {'message': 'Usuario creado exitosamente', 'user_id': user.id},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def profile(self, request):
+        """Obtener perfil del usuario autenticado"""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['put', 'patch'])
+    def update_profile(self, request):
+        """Actualizar perfil del usuario"""
+        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ===== LEGACY FUNCTIONS FOR BACKWARDS COMPATIBILITY =====
 
 def load_twilio_credentials():
     """Cargar credenciales de Twilio desde .env.twilio"""

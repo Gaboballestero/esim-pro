@@ -52,10 +52,13 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
     'corsheaders',
 ]
 
 LOCAL_APPS = [
+    'esim_backend',  # App principal con modelos y APIs
     # Apps locales desactivadas temporalmente para deployment inicial
     # 'users',  # Sistema de usuarios personalizado
     # 'plans',  # Planes de datos
@@ -167,7 +170,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',  # Permitir acceso público por defecto
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -207,7 +210,7 @@ if cors_origins_env:
 #     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Comentamos el modelo custom user por ahora - usar el default de Django
-# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'esim_backend.User'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
