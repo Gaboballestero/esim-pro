@@ -1,99 +1,273 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hablaris Admin</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-            margin: 0;
-            padding: 20px;
-        }
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .section {
-            background: #f8f9fa;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border-left: 4px solid #007bff;
-        }
-        .link-item {
-            display: block;
-            background: white;
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Panel de Administración' %}{% endblock %}
+
+{% block extrahead %}
+<style>
+    /* Header personalizado */
+    #header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: white !important;
+        font-size: 28px;
+        font-weight: 300;
+        margin: 0;
+        padding: 20px 0;
+        text-decoration: none;
+    }
+    
+    #branding h1:before {
+        content: "📱 ";
+        font-size: 32px;
+        margin-right: 10px;
+    }
+    
+    #user-tools a {
+        color: rgba(255,255,255,0.9) !important;
+        margin-left: 15px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    #user-tools a:hover {
+        color: white !important;
+        text-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+    
+    /* Dashboard mejorado */
+    .dashboard #content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+    
+    .dashboard .module {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+    }
+    
+    .dashboard .module:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .dashboard .module h2, .dashboard .module caption {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white !important;
+        margin: 0;
+        padding: 20px 25px;
+        font-size: 18px;
+        font-weight: 500;
+        border: none;
+        text-align: left;
+    }
+    
+    .dashboard .module h2 a, .dashboard .module caption a {
+        color: white !important;
+        text-decoration: none;
+    }
+    
+    /* Iconos para cada modelo */
+    .dashboard .module h2:before, .dashboard .module caption:before {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+    
+    /* eSIM Backend Models */
+    .dashboard .module h2 a[href*="country"]:before,
+    .dashboard .module caption a[href*="country"]:before { content: "🌍 "; }
+    
+    .dashboard .module h2 a[href*="region"]:before,
+    .dashboard .module caption a[href*="region"]:before { content: "🗺️ "; }
+    
+    .dashboard .module h2 a[href*="dataplan"]:before,
+    .dashboard .module caption a[href*="dataplan"]:before { content: "📊 "; }
+    
+    .dashboard .module h2 a[href*="esim"]:before,
+    .dashboard .module caption a[href*="esim"]:before { content: "🔌 "; }
+    
+    /* Auth Models */
+    .dashboard .module h2 a[href*="user"]:before,
+    .dashboard .module caption a[href*="user"]:before { content: "👥 "; }
+    
+    .dashboard .module h2 a[href*="group"]:before,
+    .dashboard .module caption a[href*="group"]:before { content: "🏷️ "; }
+    
+    .dashboard .module table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    
+    .dashboard .module th,
+    .dashboard .module td {
+        padding: 15px 25px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .dashboard .module th {
+        background: #f8f9fa !important;
+        font-weight: 600;
+        color: #495057 !important;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    
+    .dashboard .module td a {
+        color: #495057;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .dashboard .module td a:hover {
+        color: #667eea;
+    }
+    
+    /* Botones de acción */
+    .addlink, .changelink {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        padding: 8px 15px !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+        display: inline-block !important;
+        margin-right: 10px !important;
+    }
+    
+    .addlink:hover, .changelink:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+        color: white !important;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 30px;
+        font-size: 13px;
+    }
+    
+    .breadcrumbs a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .breadcrumbs a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Título principal */
+    .dashboard h1 {
+        color: #495057 !important;
+        font-size: 32px !important;
+        font-weight: 300 !important;
+        margin: 0 0 30px 0 !important;
+        text-align: center !important;
+    }
+    
+    .dashboard h1:before {
+        content: "📊 ";
+        font-size: 36px;
+        margin-right: 15px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard #content {
             padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #495057;
-            border: 1px solid #dee2e6;
         }
-        .link-item:hover {
-            background: #e9ecef;
-            text-decoration: none;
-            color: #007bff;
-        }
-        .card-link:hover {
-            background: #5a6fd8;
-    </style>
-</head>
-<body>
-    <div class="admin-container">
-        <h1>🚀 Hablaris Admin</h1>
         
-        <div class="section">
-            <h3>👤 Información de Sesión</h3>
-            <p><strong>Usuario:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Estado:</strong> Administrador Activo</p>
-        </div>
+        #branding h1 {
+            font-size: 22px !important;
+        }
+        
+        .dashboard .module h2, .dashboard .module caption {
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+        
+        .dashboard .module th,
+        .dashboard .module td {
+            padding: 12px 20px;
+        }
+    }
+    
+    /* Mejorar contraste en módulos */
+    .dashboard .module {
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Mejorar el footer */
+    #footer {
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+        font-size: 13px;
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
 
-        <div class="section">
-            <h3>👥 Gestión de Usuarios</h3>
-            <a href="/admin/auth/user/" class="link-item">
-                <strong>Ver Usuarios</strong><br>
-                <small>Administrar cuentas de usuarios registrados</small>
-            </a>
-            <a href="/admin/auth/group/" class="link-item">
-                <strong>Grupos y Permisos</strong><br>
-                <small>Gestionar grupos de permisos</small>
-            </a>
-        </div>
+{% block content %}
+    <h1>{% trans 'Panel de Administración de Hablaris eSIM' %}</h1>
 
-        <div class="section">
-            <h3>🌐 Plataforma</h3>
-            <a href="/" class="link-item">
-                <strong>Landing Page</strong><br>
-                <small>Página principal de Hablaris</small>
-            </a>
-            <a href="/store/" class="link-item">
-                <strong>Tienda eSIM</strong><br>
-                <small>Tienda funcional con filtros avanzados</small>
-            </a>
-            <a href="/shop/" class="link-item">
-                <strong>Vista Previa</strong><br>
-                <small>Demostración de la tienda</small>
-            </a>
-        </div>
+    {% if app_list %}
+        {% for app in app_list %}
+            <div class="app-{{ app.app_label }} module">
+                <table>
+                    <caption>
+                        <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+                    </caption>
+                    {% for model in app.models %}
+                        <tr class="model-{{ model.object_name|lower }}">
+                            {% if model.admin_url %}
+                                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                            {% else %}
+                                <th scope="row">{{ model.name }}</th>
+                            {% endif %}
 
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="/admin/logout/" style="background: #dc3545; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px;">
-                🚪 Cerrar Sesión
-            </a>
-        </div>
-    </div>
-</body>
-</html>
+                            {% if model.add_url %}
+                                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+                            {% else %}
+                                <td>&nbsp;</td>
+                            {% endif %}
+
+                            {% if model.admin_url %}
+                                {% if model.view_only %}
+                                    <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
+                                {% else %}
+                                    <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                                {% endif %}
+                            {% else %}
+                                <td>&nbsp;</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>{% trans "You don't have permission to edit anything." %}</p>
+    {% endif %}
+{% endblock %}
