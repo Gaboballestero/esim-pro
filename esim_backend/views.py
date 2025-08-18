@@ -6,173 +6,148 @@ import io
 
 def emergency_migrate(request):
     """Vista de emergencia para aplicar migraciones en Railway"""
+    import os
+    import subprocess
+    
     try:
         # Capturar output de las migraciones
         output = io.StringIO()
+        output2 = io.StringIO()
+        
+        makemigrations_success = False
+        migrate_success = False
         
         # Primero hacer makemigrations
         try:
-            call_command('makemigrations', 'esim_backend', stdout=output)
+            call_command('makemigrations', 'esim_backend', stdout=output, stderr=output)
             makemigrations_output = output.getvalue()
+            makemigrations_success = True
         except Exception as e:
-            makemigrations_output = f"Error en makemigrations: {str(e)}"
+            makemigrations_output = f"❌ Error en makemigrations: {str(e)}"
         
         # Luego aplicar migrate
-        output2 = io.StringIO()
         try:
-            call_command('migrate', stdout=output2)
+            call_command('migrate', stdout=output2, stderr=output2)
             migrate_output = output2.getvalue()
+            migrate_success = True
         except Exception as e:
-            migrate_output = f"Error en migrate: {str(e)}"
+            migrate_output = f"❌ Error en migrate: {str(e)}"
         
-        # Verificar si las tablas existen
+        # Verificar si las tablas se crearon
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'esim_backend_%';")
-        tables = cursor.fetchall()
+        try:
+            # Intentar SQLite primero
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'esim_backend_%';")
+            esim_tables = cursor.fetchall()
+        except:
+            try:
+                # Si falla, intentar PostgreSQL
+                cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'esim_backend_%';")
+                esim_tables = cursor.fetchall()
+            except Exception as e:
+                esim_tables = []
         
-        # Verificar si los modelos están registrados
+        # Verificar si los modelos están registrados en el admin
         from django.contrib import admin
-        from .models import Country, Region, DataPlan, ESim
+        try:
+            from .models import Country, Region, DataPlan, ESim
+            registered_models = []
+            for model in [Country, Region, DataPlan, ESim]:
+                if model in admin.site._registry:
+                    registered_models.append(f"✅ {model.__name__}")
+                else:
+                    registered_models.append(f"❌ {model.__name__} - No registrado")
+        except Exception as e:
+            registered_models = [f"❌ Error importando modelos: {str(e)}"]
         
-        registered_models = []
-        for model in [Country, Region, DataPlan, ESim]:
-            if model in admin.site._registry:
-                registered_models.append(f"✅ {model.__name__}")
-            else:
-                registered_models.append(f"❌ {model.__name__}")
+        # Verificar admin user
+        try:
+            from django.contrib.auth.models import User
+            admin_exists = User.objects.filter(username='admin').exists()
+            admin_status = "✅ Admin existe" if admin_exists else "❌ Admin no existe"
+        except:
+            admin_status = "❌ Error verificando admin"
+        
+        success_count = sum([makemigrations_success, migrate_success, len(esim_tables) > 0, admin_exists])
         
         html = f"""
         <html>
         <head><title>🚀 MIGRACIONES RAILWAY</title></head>
-        <body style="font-family: Arial; margin: 40px;">
-        
-        <h1>🚀 DIAGNÓSTICO Y MIGRACIONES RAILWAY</h1>
-        
-        <h2>📋 MAKEMIGRATIONS:</h2>
-        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
-{makemigrations_output}
-        </pre>
-        
-        <h2>⚡ MIGRATE:</h2>
-        <pre style="background: #f4f4f4; padding: 20px; border-radius: 8px; max-height: 200px; overflow-y: auto;">
-{migrate_output}
-        </pre>
-        
-        <h2>🗄️ TABLAS CREADAS:</h2>
-        <ul>
-            {''.join([f"<li>📊 {table[0]}</li>" for table in tables]) if tables else "<li>❌ No hay tablas esim_backend</li>"}
-        </ul>
-        
-        <h2>📝 MODELOS REGISTRADOS EN ADMIN:</h2>
-        <ul>
-            {''.join([f"<li>{model}</li>" for model in registered_models])}
-        </ul>
-        
-        <br><br>
-        <div style="background: #3b82f6; padding: 20px; border-radius: 10px; text-align: center;">
-            <a href="/admin/" style="color: white; font-size: 18px; text-decoration: none; font-weight: bold;">
-                🎯 IR AL ADMIN AHORA - admin/admin123
-            </a>
-        </div>
-        
-        <br>
-        <p><strong>🔄 Si no ves los modelos:</strong></p>
-        <ol>
-            <li>Refrescar la página del admin</li>
-            <li>Cerrar sesión y volver a entrar</li>
-            <li>Verificar que las tablas se crearon arriba</li>
-        </ol>
-        
-        </body>
-        </html>
-        """
-        return HttpResponse(html)
-        
-    except Exception as e:
-        return HttpResponse(f'<h1>❌ Error crítico: {e}</h1><pre>{str(e.__traceback__)}</pre>')
-
-def emergency_admin(request):
-    """Vista de emergencia para crear admin en Railway"""
-    try:
-        from django.contrib.auth.models import User
-        
-        # Verificar si admin existe
-        admin_exists = User.objects.filter(username='admin').exists()
-        
-        if not admin_exists:
-            # Crear admin si no existe
-            user = User.objects.create_superuser('admin', 'admin@hablaris.com', 'admin123')
-            message = "✅ ADMIN CREADO EXITOSAMENTE"
-            status = "NUEVO"
-        else:
-            # Admin existe, actualizar password por si acaso
-            user = User.objects.get(username='admin')
-            user.set_password('admin123')
-            user.is_superuser = True
-            user.is_staff = True
-            user.save()
-            message = "🔄 ADMIN YA EXISTÍA - PASSWORD ACTUALIZADO"
-            status = "ACTUALIZADO"
-        
-        # Verificar credenciales
-        from django.contrib.auth import authenticate
-        auth_user = authenticate(username='admin', password='admin123')
-        auth_status = "✅ CREDENCIALES VÁLIDAS" if auth_user else "❌ ERROR EN CREDENCIALES"
-        
-        html = f"""
-        <html>
-        <head><title>👤 ADMIN EMERGENCY</title></head>
-        <body style="font-family: Arial; margin: 40px; background: #f0f8ff;">
+        <body style="font-family: Arial; margin: 40px; background: #f8fafc;">
         
         <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         
-        <h1 style="color: #3b82f6;">👤 ADMIN DE EMERGENCIA RAILWAY</h1>
+        <h1 style="color: #1f2937;">🚀 MIGRACIONES Y DIAGNÓSTICO RAILWAY</h1>
         
-        <div style="background: #10b981; color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-            <h2>📊 ESTADO: {message}</h2>
-            <p><strong>Status:</strong> {status}</p>
-            <p><strong>Verificación:</strong> {auth_status}</p>
+        <div style="background: {'#d1fae5' if success_count >= 3 else '#fef3c7' if success_count >= 2 else '#fecaca'}; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h2>📊 RESULTADO GENERAL: {success_count}/4 ✅</h2>
         </div>
         
-        <div style="background: #fef3c7; padding: 20px; border-radius: 10px; border-left: 5px solid #f59e0b;">
-            <h3>🔑 CREDENCIALES CONFIRMADAS:</h3>
-            <div style="font-size: 20px; font-weight: bold;">
-                <p>👤 Usuario: <code style="background: #e5e7eb; padding: 5px;">admin</code></p>
-                <p>🔒 Password: <code style="background: #e5e7eb; padding: 5px;">admin123</code></p>
-            </div>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>📋 MAKEMIGRATIONS:</h3>
+            <pre style="background: white; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto; border-left: 4px solid {'#10b981' if makemigrations_success else '#ef4444'};">
+{makemigrations_output}
+            </pre>
         </div>
         
-        <div style="background: #dbeafe; padding: 20px; border-radius: 10px; margin: 20px 0;">
-            <h3>📋 DETALLES TÉCNICOS:</h3>
-            <ul>
-                <li>✅ Superuser: {user.is_superuser}</li>
-                <li>✅ Staff: {user.is_staff}</li>
-                <li>✅ Activo: {user.is_active}</li>
-                <li>📧 Email: {user.email}</li>
-                <li>📅 Último login: {user.last_login or 'Nunca'}</li>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>⚡ MIGRATE:</h3>
+            <pre style="background: white; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto; border-left: 4px solid {'#10b981' if migrate_success else '#ef4444'};">
+{migrate_output}
+            </pre>
+        </div>
+        
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>🗄️ TABLAS EN BASE DE DATOS:</h3>
+            <ul style="background: white; padding: 15px; border-radius: 5px; margin: 0;">
+                {(''.join([f"<li style='color: #10b981;'>✅ {table[0]}</li>" for table in esim_tables]) if esim_tables else "<li style='color: #ef4444;'>❌ No hay tablas esim_backend creadas</li>")}
             </ul>
         </div>
         
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="/admin/" 
-               style="background: #3b82f6; color: white; padding: 15px 30px; 
-                      text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;
-                      display: inline-block; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
-                🎯 PROBAR LOGIN ADMIN AHORA
-            </a>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>📝 MODELOS EN ADMIN:</h3>
+            <ul style="background: white; padding: 15px; border-radius: 5px; margin: 0;">
+                {''.join([f"<li>{model}</li>" for model in registered_models])}
+            </ul>
         </div>
         
-        <div style="background: #fecaca; padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444;">
-            <h4>🚨 Si aún no puedes entrar:</h4>
-            <ol>
-                <li>Copia exactamente: <strong>admin</strong></li>
-                <li>Copia exactamente: <strong>admin123</strong></li>
-                <li>Verifica que no hay espacios extra</li>
-                <li>Prueba en ventana incógnito</li>
-            </ol>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>👤 ADMIN USER:</h3>
+            <p style="background: white; padding: 15px; border-radius: 5px; margin: 0;">{admin_status}</p>
         </div>
+        """
         
+        if success_count >= 3:
+            html += f"""
+            <div style="background: #d1fae5; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                <h3 style="color: #10b981;">🎉 ¡ÉXITO! Todo listo para usar</h3>
+                <a href="/admin/" 
+                   style="background: #10b981; color: white; padding: 15px 30px; 
+                          text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;
+                          display: inline-block; margin: 10px;">
+                    🎯 IR AL ADMIN AHORA
+                </a>
+            </div>
+            """
+        else:
+            html += f"""
+            <div style="background: #fef3c7; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                <h3 style="color: #d97706;">⚠️ Faltan pasos por completar</h3>
+                <a href="/create-admin-emergency/" 
+                   style="background: #d97706; color: white; padding: 10px 20px; 
+                          text-decoration: none; border-radius: 5px; margin: 10px;">
+                    🔧 CREAR ADMIN
+                </a>
+                <a href="/emergency-migrate/" 
+                   style="background: #dc3545; color: white; padding: 10px 20px; 
+                          text-decoration: none; border-radius: 5px; margin: 10px;">
+                    🔄 REINTENTAR
+                </a>
+            </div>
+            """
+        
+        html += """
         </div>
         </body>
         </html>
@@ -181,11 +156,134 @@ def emergency_admin(request):
         
     except Exception as e:
         return HttpResponse(f'''
-        <h1>❌ Error crítico al crear admin</h1>
-        <pre style="background: #fef2f2; padding: 20px; border-radius: 8px; color: #dc2626;">
-        {str(e)}
-        </pre>
-        <p><a href="/admin/">Ir al admin de todas formas</a></p>
+        <h1>❌ Error crítico en migraciones</h1>
+        <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px;">
+            <h2>Error técnico:</h2>
+            <pre style="color: #dc2626;">{str(e)}</pre>
+        </div>
+        <div style="text-align: center;">
+            <a href="/create-admin-emergency/" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                🔧 IR A DIAGNÓSTICO
+            </a>
+        </div>
+        ''')
+
+def emergency_admin(request):
+    """Vista de emergencia para crear admin en Railway"""
+    try:
+        from django.contrib.auth.models import User
+        from django.db import connection
+        
+        # Verificar si las tablas de modelos eSIM existen
+        cursor = connection.cursor()
+        try:
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'esim_backend_%';")
+            esim_tables = cursor.fetchall()
+            tables_exist = len(esim_tables) > 0
+        except:
+            # Si es PostgreSQL en lugar de SQLite
+            try:
+                cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'esim_backend_%';")
+                esim_tables = cursor.fetchall()
+                tables_exist = len(esim_tables) > 0
+            except:
+                tables_exist = False
+                esim_tables = []
+        
+        # Verificar si admin existe
+        try:
+            admin_exists = User.objects.filter(username='admin').exists()
+            if not admin_exists:
+                user = User.objects.create_superuser('admin', 'admin@hablaris.com', 'admin123')
+                admin_status = "✅ ADMIN CREADO"
+            else:
+                user = User.objects.get(username='admin')
+                user.set_password('admin123')
+                user.is_superuser = True
+                user.is_staff = True
+                user.save()
+                admin_status = "🔄 ADMIN ACTUALIZADO"
+        except Exception as e:
+            admin_status = f"❌ ERROR ADMIN: {str(e)}"
+            user = None
+        
+        # Si no existen las tablas, necesitamos migrar
+        if not tables_exist:
+            migration_needed = True
+            migration_msg = "🚨 NECESITA MIGRACIONES - Tablas eSIM no existen"
+        else:
+            migration_needed = False
+            migration_msg = f"✅ TABLAS ENCONTRADAS: {len(esim_tables)}"
+        
+        html = f"""
+        <html>
+        <head><title>� DIAGNÓSTICO RAILWAY</title></head>
+        <body style="font-family: Arial; margin: 40px; background: #f0f8ff;">
+        
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        
+        <h1 style="color: #3b82f6;">� DIAGNÓSTICO COMPLETO RAILWAY</h1>
+        
+        <div style="background: {'#fecaca' if migration_needed else '#d1fae5'}; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h2>📊 ESTADO BASE DE DATOS</h2>
+            <p><strong>{migration_msg}</strong></p>
+            <p><strong>Tablas encontradas:</strong> {[table[0] for table in esim_tables] if esim_tables else 'Ninguna'}</p>
+        </div>
+        
+        <div style="background: #e0f2fe; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h2>� ESTADO ADMIN</h2>
+            <p><strong>{admin_status}</strong></p>
+            {'<p><strong>Credenciales:</strong> admin / admin123</p>' if user else ''}
+        </div>
+        """
+        
+        if migration_needed:
+            html += f"""
+            <div style="background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 5px solid #ffc107;">
+                <h3>⚡ SOLUCIÓN REQUERIDA</h3>
+                <p><strong>Las tablas eSIM no existen. Necesitas aplicar migraciones.</strong></p>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="/emergency-migrate/" 
+                       style="background: #dc3545; color: white; padding: 15px 30px; 
+                              text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;
+                              display: inline-block; box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);">
+                        🚨 APLICAR MIGRACIONES AHORA
+                    </a>
+                </div>
+            </div>
+            """
+        else:
+            html += f"""
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="/admin/" 
+                   style="background: #28a745; color: white; padding: 15px 30px; 
+                          text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;
+                          display: inline-block; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);">
+                    ✅ IR AL ADMIN - TODO LISTO
+                </a>
+            </div>
+            """
+        
+        html += """
+        </div>
+        </body>
+        </html>
+        """
+        return HttpResponse(html)
+        
+    except Exception as e:
+        return HttpResponse(f'''
+        <h1>❌ Error en diagnóstico</h1>
+        <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2>Error técnico:</h2>
+            <pre style="color: #dc2626;">{str(e)}</pre>
+        </div>
+        <div style="text-align: center;">
+            <a href="/emergency-migrate/" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                🚨 INTENTAR MIGRACIONES
+            </a>
+        </div>
         ''')
 
 def home(request):
