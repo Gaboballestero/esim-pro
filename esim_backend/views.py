@@ -96,14 +96,97 @@ def emergency_admin(request):
     """Vista de emergencia para crear admin en Railway"""
     try:
         from django.contrib.auth.models import User
-        # Crear admin si no existe
-        if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@hablaris.com', 'admin123')
-            return HttpResponse('<h1>✅ Admin creado: admin/admin123</h1><a href="/admin/">Ir al admin</a>')
+        
+        # Verificar si admin existe
+        admin_exists = User.objects.filter(username='admin').exists()
+        
+        if not admin_exists:
+            # Crear admin si no existe
+            user = User.objects.create_superuser('admin', 'admin@hablaris.com', 'admin123')
+            message = "✅ ADMIN CREADO EXITOSAMENTE"
+            status = "NUEVO"
         else:
-            return HttpResponse('<h1>ℹ️ Admin ya existe: admin/admin123</h1><a href="/admin/">Ir al admin</a>')
+            # Admin existe, actualizar password por si acaso
+            user = User.objects.get(username='admin')
+            user.set_password('admin123')
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+            message = "🔄 ADMIN YA EXISTÍA - PASSWORD ACTUALIZADO"
+            status = "ACTUALIZADO"
+        
+        # Verificar credenciales
+        from django.contrib.auth import authenticate
+        auth_user = authenticate(username='admin', password='admin123')
+        auth_status = "✅ CREDENCIALES VÁLIDAS" if auth_user else "❌ ERROR EN CREDENCIALES"
+        
+        html = f"""
+        <html>
+        <head><title>👤 ADMIN EMERGENCY</title></head>
+        <body style="font-family: Arial; margin: 40px; background: #f0f8ff;">
+        
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        
+        <h1 style="color: #3b82f6;">👤 ADMIN DE EMERGENCIA RAILWAY</h1>
+        
+        <div style="background: #10b981; color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h2>📊 ESTADO: {message}</h2>
+            <p><strong>Status:</strong> {status}</p>
+            <p><strong>Verificación:</strong> {auth_status}</p>
+        </div>
+        
+        <div style="background: #fef3c7; padding: 20px; border-radius: 10px; border-left: 5px solid #f59e0b;">
+            <h3>🔑 CREDENCIALES CONFIRMADAS:</h3>
+            <div style="font-size: 20px; font-weight: bold;">
+                <p>👤 Usuario: <code style="background: #e5e7eb; padding: 5px;">admin</code></p>
+                <p>🔒 Password: <code style="background: #e5e7eb; padding: 5px;">admin123</code></p>
+            </div>
+        </div>
+        
+        <div style="background: #dbeafe; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>📋 DETALLES TÉCNICOS:</h3>
+            <ul>
+                <li>✅ Superuser: {user.is_superuser}</li>
+                <li>✅ Staff: {user.is_staff}</li>
+                <li>✅ Activo: {user.is_active}</li>
+                <li>📧 Email: {user.email}</li>
+                <li>📅 Último login: {user.last_login or 'Nunca'}</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/admin/" 
+               style="background: #3b82f6; color: white; padding: 15px 30px; 
+                      text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold;
+                      display: inline-block; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
+                🎯 PROBAR LOGIN ADMIN AHORA
+            </a>
+        </div>
+        
+        <div style="background: #fecaca; padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444;">
+            <h4>🚨 Si aún no puedes entrar:</h4>
+            <ol>
+                <li>Copia exactamente: <strong>admin</strong></li>
+                <li>Copia exactamente: <strong>admin123</strong></li>
+                <li>Verifica que no hay espacios extra</li>
+                <li>Prueba en ventana incógnito</li>
+            </ol>
+        </div>
+        
+        </div>
+        </body>
+        </html>
+        """
+        return HttpResponse(html)
+        
     except Exception as e:
-        return HttpResponse(f'<h1>❌ Error: {e}</h1>')
+        return HttpResponse(f'''
+        <h1>❌ Error crítico al crear admin</h1>
+        <pre style="background: #fef2f2; padding: 20px; border-radius: 8px; color: #dc2626;">
+        {str(e)}
+        </pre>
+        <p><a href="/admin/">Ir al admin de todas formas</a></p>
+        ''')
 
 def home(request):
     """Vista principal de la landing page"""
