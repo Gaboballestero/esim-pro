@@ -2,9 +2,6 @@
 
 # eSIM Pro - Copilot Instructions
 
-## Project Overview
-This is a comprehensive eSIM management platform similar to Holafly, built with modern technologies for web, iOS, and Android platforms.
-
 ## Tech Stack
 - **Backend**: Django 5.2+ with Django REST Framework
 - **Frontend Web**: Next.js 14 with TypeScript and Tailwind CSS
